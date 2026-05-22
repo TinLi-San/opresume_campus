@@ -114,28 +114,24 @@ export function CustomFieldsEditor({ fields, onChange }: CustomFieldsEditorProps
     }),
   );
 
-  // 确保始终有一个空行
-  const ensureGhostRow = () => {
-    const hasEmptyField = fields.some((f) => !f.key.trim() && !f.value.trim());
-    if (!hasEmptyField) {
-      const newField: CustomField = {
-        id: `custom-${Date.now()}`,
-        key: '',
-        value: '',
-      };
-      onChange([...fields, newField]);
-    }
+  // 当 list 中已经存在"未完成"行（key 或 value 任一为空）时原样返回；否则追加一行空白行。
+  // 仅在用户行为完成的时机调用（挂载、删除、失焦），避免输入过程中插行造成抖动。
+  const withGhostRow = (list: CustomField[]): CustomField[] => {
+    const hasIncomplete = list.some((f) => !f.key.trim() || !f.value.trim());
+    if (hasIncomplete) return list;
+    return [...list, { id: `custom-${Date.now()}`, key: '', value: '' }];
   };
 
-  // 初始化时确保有幽灵行
+  // 挂载时保证至少有一行未完成行
   useEffect(() => {
-    ensureGhostRow();
+    const ensured = withGhostRow(fields);
+    if (ensured !== fields) onChange(ensured);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleDelete = () => {
     if (deleteId) {
-      onChange(fields.filter((f) => f.id !== deleteId));
+      onChange(withGhostRow(fields.filter((f) => f.id !== deleteId)));
       setDeleteId(null);
     }
   };
@@ -151,7 +147,7 @@ export function CustomFieldsEditor({ fields, onChange }: CustomFieldsEditorProps
 
     // 如果字段为空，直接删除
     if (isEmpty) {
-      onChange(fields.filter((f) => f.id !== field.id));
+      onChange(withGhostRow(fields.filter((f) => f.id !== field.id)));
     } else {
       setDeleteId(field.id!);
     }
@@ -165,11 +161,11 @@ export function CustomFieldsEditor({ fields, onChange }: CustomFieldsEditorProps
     useUIStore.getState().updateCustomFieldIcon(fieldKey, icon);
   };
 
+  // 失焦时，若当前行已填完整（key 和 value 都有值），追加新的空白行
   const handleBlur = (id: string) => {
     const field = fields.find((f) => f.id === id);
-    // 只有当 key 和 value 都有值时才新增幽灵行
     if (field && field.key.trim() && field.value.trim()) {
-      ensureGhostRow();
+      onChange(withGhostRow(fields));
     }
   };
 
