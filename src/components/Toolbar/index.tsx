@@ -56,6 +56,9 @@ export function Toolbar() {
   const save = useResumeStore((s) => s.save);
   const reduceMotion = useReducedMotion();
   const layoutTransition = reduceMotion ? LAYOUT_TRANSITION_NONE : LAYOUT_TRANSITION_SMOOTH;
+  const hideVersion = import.meta.env.DEV
+    && typeof window !== 'undefined'
+    && new URLSearchParams(window.location.search).get('noVersion') === 'true';
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -141,9 +144,11 @@ export function Toolbar() {
               {t('app.fullName')}
             </span>
           </button>
-          <Badge variant="secondary" className="ml-1.5 translate-y-px px-1.5 py-0 text-[10px] leading-4 font-medium text-muted-foreground">
-            v{__APP_VERSION__}
-          </Badge>
+          {!hideVersion && (
+            <Badge variant="secondary" className="ml-1.5 translate-y-px px-1.5 py-0 text-[10px] leading-4 font-medium text-muted-foreground">
+              v{__APP_VERSION__}
+            </Badge>
+          )}
         </div>
         <div className="flex items-center gap-2">
           {/* 三个按钮各包 motion.div + layout：i18n 切换时按钮宽度由 layout 平滑过渡。
