@@ -138,10 +138,8 @@ src/
 
 **加入方式**：
 
-扫码添加下方微信，备注 **优派简历**，我会拉你入群。
-
 <div align="left">
-  <img src="docs/images/wechat_qr.webp" alt="微信二维码" width="300" />
+  <img src="docs/images/wechat_group_qr.webp" alt="微信群二维码" width="300" />
 </div>
 
 ---
