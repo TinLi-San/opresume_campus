@@ -1,6 +1,5 @@
 # Claude 工作文件
 .claude
-CLAUDE.md
 
 # 依赖包和构建输出
 node_modules
