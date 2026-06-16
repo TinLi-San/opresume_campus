@@ -6,6 +6,7 @@ import { getEffectiveLayout } from '@/config/layout';
 
 import { EducationModule } from './EducationModule';
 import { AwardModule } from './AwardModule';
+import { AchievementModule } from './AchievementModule';
 import { WorkExpModule } from './WorkExpModule';
 import { ProjectModule } from './ProjectModule';
 import { WorkListModule } from './WorkListModule';
@@ -17,6 +18,7 @@ import { CustomModule } from './CustomModule';
 export const MODULE_COMPONENTS: Record<string, ComponentType<ModuleProps>> = {
   educationList: EducationModule,
   awardList: AwardModule,
+  achievementList: AchievementModule,
   workExpList: WorkExpModule,
   projectList: ProjectModule,
   workList: WorkListModule,

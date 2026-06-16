@@ -161,6 +161,24 @@
       "x-op-id": "award-4"
     }
   ],
+  "publications": [
+    {
+      "name": "基于深度学习的前端性能优化研究",
+      "publisher": "计算机学报",
+      "releaseDate": "2023.06",
+      "x-op-type": "论文",
+      "x-op-identifier": "DOI: 10.1234/jcs.2023.06.001",
+      "x-op-id": "publication-1"
+    },
+    {
+      "name": "一种前端组件自动化测试方法及系统",
+      "publisher": "国家知识产权局",
+      "releaseDate": "2022.11",
+      "x-op-type": "发明专利",
+      "x-op-identifier": "CN202211234567.8",
+      "x-op-id": "publication-2"
+    }
+  ],
   "x-op-avatar": {
     "width": 90,
     "height": 126,

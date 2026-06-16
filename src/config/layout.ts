@@ -34,6 +34,7 @@ export const SORTABLE_MODULES = [
   'projectList',
   'skillList',
   'awardList',
+  'achievementList',
   'workList',
   'aboutme',
 ] as const;

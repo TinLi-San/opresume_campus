@@ -123,6 +123,20 @@ export const schemas: ModuleSchema[] = [
     defaultItem: () => ({ 'x-op-id': uid('award'), title: '', date: '' }),
   },
   {
+    module: 'achievementList',
+    dataKey: 'publications',
+    isList: true,
+    titleKey: 'name',
+    fields: [
+      { key: 'name', labelKey: 'field.achievementTitle', type: 'text' },
+      { key: 'x-op-type', labelKey: 'field.achievementType', type: 'text' },
+      { key: 'publisher', labelKey: 'field.achievementOrganization', type: 'text' },
+      { key: 'x-op-identifier', labelKey: 'field.achievementIdentifier', type: 'text' },
+      { key: 'releaseDate', labelKey: 'field.achievementDate', type: 'text' },
+    ],
+    defaultItem: () => ({ 'x-op-id': uid('publication'), name: '', 'x-op-type': '', publisher: '', 'x-op-identifier': '', releaseDate: '' }),
+  },
+  {
     module: 'workList',
     dataKey: 'projects',
     isList: true,

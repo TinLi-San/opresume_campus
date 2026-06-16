@@ -194,3 +194,9 @@ export interface JsonSkill extends ResumeSkill {
 export interface JsonAward extends ResumeAward {
   'x-op-id'?: string;
 }
+
+export interface JsonPublication extends ResumePublication {
+  'x-op-id'?: string;
+  'x-op-type'?: string;        // 扩展字段：类型标签（论文/专利/报告等）
+  'x-op-identifier'?: string;  // 扩展字段：编号（专利号/DOI等）
+}

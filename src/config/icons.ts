@@ -447,6 +447,7 @@ export const DEFAULT_MODULE_ICONS: Record<string, string> = {
   projectList: 'FolderKanban',
   skillList: 'Wrench',
   awardList: 'Trophy',
+  achievementList: 'Award',
   workList: 'Palette',
   aboutme: 'User',
 };
