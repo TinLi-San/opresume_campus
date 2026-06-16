@@ -12,6 +12,8 @@ interface RichTextEditorProps {
   placeholder?: string;
 }
 
+const parseOptions = { preserveWhitespace: 'full' as const };
+
 export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
   const { t } = useTranslation();
 
@@ -34,6 +36,7 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
       }),
     ],
     content: value,
+    parseOptions,
     onUpdate: ({ editor: e }) => {
       const html = e.getHTML();
       onChange(html === '<p></p>' ? '' : html);
@@ -44,7 +47,9 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
     if (!editor) return;
     const current = editor.getHTML();
     if (value !== current && value !== (current === '<p></p>' ? '' : current)) {
-      editor.commands.setContent(value || '');
+      editor.commands.setContent(value || '', {
+        parseOptions,
+      });
     }
   }, [value, editor]);
 
