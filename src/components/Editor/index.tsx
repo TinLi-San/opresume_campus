@@ -14,6 +14,8 @@ import {
   type DragStartEvent,
   type DragEndEvent,
   type DragOverEvent,
+  type DraggableAttributes,
+  type DraggableSyntheticListeners,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -93,6 +95,9 @@ function SortableModuleHeader({
   onTitleChange,
   onIconChange,
   onDelete,
+  dragAttributes,
+  dragListeners,
+  setDragActivatorRef,
 }: {
   module: string;
   expanded: boolean;
@@ -105,13 +110,14 @@ function SortableModuleHeader({
   onIconChange: (icon: string | undefined) => void;
   /** 仅自定义模块有此回调，点击后触发删除确认 */
   onDelete?: () => void;
+  dragAttributes: DraggableAttributes;
+  dragListeners: DraggableSyntheticListeners;
+  setDragActivatorRef: (element: HTMLElement | null) => void;
 }) {
   const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: module });
-  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 };
 
   const startEditing = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -127,14 +133,11 @@ function SortableModuleHeader({
 
   return (
     <div
-      ref={setNodeRef}
-      style={style}
       className={cn(
         editorHeaderRootClass,
         'bg-editor-module',
         expanded && 'bg-editor-module-active',
       )}
-      id={`editor-${module}`}
     >
       <span className={cn('absolute left-0 top-0 bottom-0 w-[3px] transition-colors', expanded ? 'bg-resume-primary' : 'bg-transparent')} />
       <Button
@@ -142,8 +145,9 @@ function SortableModuleHeader({
         size="icon"
         className="h-6 w-6 shrink-0 cursor-grab text-gray-400 hover:text-gray-600"
         aria-label={t('common.dragSort')}
-        {...attributes}
-        {...listeners}
+        ref={setDragActivatorRef}
+        {...dragAttributes}
+        {...(dragListeners ?? {})}
       >
         <GripVertical className="h-4 w-4" />
       </Button>
@@ -487,6 +491,73 @@ function CustomModuleContent({
 }
 
 /* ── 可排序的模块列表（一个栏） ── */
+function SortableModule({
+  module,
+  expanded,
+  hidden,
+  canHide,
+  customTitle,
+  moduleIcon,
+  children,
+  onToggleHidden,
+  onTitleChange,
+  onIconChange,
+  onDelete,
+}: {
+  module: string;
+  expanded: boolean;
+  hidden: boolean;
+  canHide: boolean;
+  customTitle?: string;
+  moduleIcon?: string;
+  children: React.ReactNode;
+  onToggleHidden: () => void;
+  onTitleChange: (title: string) => void;
+  onIconChange: (icon: string | undefined) => void;
+  onDelete?: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setActivatorNodeRef,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: module });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} id={`editor-${module}`}>
+      <SortableModuleHeader
+        module={module}
+        expanded={expanded}
+        hidden={hidden}
+        canHide={canHide}
+        customTitle={customTitle}
+        moduleIcon={moduleIcon}
+        onToggleHidden={onToggleHidden}
+        onTitleChange={onTitleChange}
+        onIconChange={onIconChange}
+        onDelete={onDelete}
+        dragAttributes={attributes}
+        dragListeners={listeners}
+        setDragActivatorRef={setActivatorNodeRef}
+      />
+      <CollapsibleContent
+        className={isDragging ? 'data-[state=open]:animate-none data-[state=closed]:animate-none' : undefined}
+      >
+        <div className="pt-3 pb-4">{children}</div>
+      </CollapsibleContent>
+    </div>
+  );
+}
+
 function SortableColumn({
   columnId,
   modules,
@@ -577,7 +648,7 @@ function SortableColumn({
 
             return (
               <Collapsible key={module} open={isExpanded} onOpenChange={() => toggle(module)}>
-                <SortableModuleHeader
+                <SortableModule
                   module={module}
                   expanded={isExpanded}
                   hidden={hidden}
@@ -588,18 +659,15 @@ function SortableColumn({
                   onTitleChange={(title) => handleTitleChange(module, title)}
                   onIconChange={(icon) => handleIconChange(module, icon)}
                   onDelete={isCustom ? () => onRequestDeleteCustomModule(module) : undefined}
-                />
-                <CollapsibleContent>
-                  <div className="pt-3 pb-4">
-                    {isCustom ? (
-                      <CustomModuleContent moduleId={module} config={config} update={update} />
-                    ) : module === 'profile' ? (
-                      <ProfileSection schema={schema} config={config} update={update} />
-                    ) : (
-                      <ModuleContent schema={schema} config={config} update={update} />
-                    )}
-                  </div>
-                </CollapsibleContent>
+                >
+                  {isCustom ? (
+                    <CustomModuleContent moduleId={module} config={config} update={update} />
+                  ) : module === 'profile' ? (
+                    <ProfileSection schema={schema} config={config} update={update} />
+                  ) : (
+                    <ModuleContent schema={schema} config={config} update={update} />
+                  )}
+                </SortableModule>
               </Collapsible>
             );
           })

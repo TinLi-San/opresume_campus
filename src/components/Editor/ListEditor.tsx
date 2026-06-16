@@ -62,11 +62,12 @@ function SortableItem({
   const [expanded, setExpanded] = useState(false);
   const reduceMotion = useReducedMotion();
   const id = item['x-op-id'] as string;
-  const { attributes, listeners, setNodeRef, transform, transition } =
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id });
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    opacity: isDragging ? 0 : 1,
   };
 
   const title = schema.titleKey
@@ -96,7 +97,9 @@ function SortableItem({
       layout 不开 —— 拖拽排序的位移由 dnd-kit transform 处理，layout 动画会和它打架。
     */
     <motion.div
-      className="overflow-hidden"
+      ref={setNodeRef}
+      style={style}
+      className="relative overflow-hidden"
       initial={
         reduceMotion
           ? { opacity: 0 }
@@ -121,8 +124,6 @@ function SortableItem({
     >
       <Collapsible open={expanded} onOpenChange={setExpanded} asChild>
         <div
-          ref={setNodeRef}
-          style={style}
           className="overflow-hidden rounded-lg border border-gray-200 bg-white"
         >
           <div className="flex min-w-0 items-center gap-2 overflow-hidden px-3 py-2.5">
