@@ -26,6 +26,10 @@
 - **Theme color customization**: 8+ meticulously crafted preset color themes to match the visual tone of different industries.
 - **Smart auto-pagination**: Automatic visual page breaks when content exceeds A4 boundaries, with a modern floating page indicator.
 
+### 🤖 AI-Powered Assistant
+- **AI Resume Import**: Upload a PDF resume and let AI automatically extract and populate information for quick migration.
+- **AI Content Rewrite**: Optimize your resume content with one click to enhance professionalism and clarity.
+
 ### 🚀 Ultimate User Experience
 - **WYSIWYG editing**: Sidebar drawer-style form editing with real-time preview on the main canvas.
 - **Privacy protection mode**: One-click redaction mode that automatically masks name, phone, email, and other sensitive info — perfect for sharing resumes in communities for review.
@@ -101,6 +105,7 @@ npm run preview
 - [x] Internationalization (i18n) support
 - [x] AI-powered resume import
 - [x] AI rewrite
+- [ ] Multiple AI provider support
 - [ ] AI resume scoring & analysis
 - [ ] Multiple resume management
 - [ ] Smart fit-to-page
@@ -118,9 +123,12 @@ src/
 │   │   └── modules/       # Base module renderers (experience, education, skills, etc.)
 │   ├── Editor/            # Sidebar drawer & dynamic forms
 │   ├── Toolbar/           # Top toolbar (appearance controls / export)
+│   ├── Settings/          # Settings panel (AI provider configuration, etc.)
 │   └── ui/                # shadcn/ui base component library
+├── config/                # Configuration files
+│   └── ai-providers/      # AI provider configurations
 ├── store/                 # Zustand state slices
-├── services/              # Pure local IO operations (load / save / migrate data)
+├── services/              # Business logic (AI generation/polish, PDF parsing, data storage, etc.)
 ├── hooks/                 # Custom hooks (pagination, redaction logic, etc.)
 └── types/                 # Global TypeScript type definitions
 ```
