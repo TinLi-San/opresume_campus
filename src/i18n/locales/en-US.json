@@ -153,7 +153,9 @@
     "template1": "Classic",
     "template2": "Compact",
     "template3": "Centered",
-    "template4": "Formal"
+    "template4": "Formal",
+    "template5": "Clear Classic",
+    "template6": "Shadow Canon"
   },
   "templateTag": {
     "twoColumn": "Two-column",

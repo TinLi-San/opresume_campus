@@ -40,13 +40,13 @@ export function useTemplateModules(
 ): { sidebarContent: ReactNode; mainContent: ReactNode } {
   const layout = getEffectiveLayout(def.id, config['x-op-moduleLayout']);
   const tokens = def.getTokens();
+  const sidebarTokens = def.getSidebarTokens?.() ?? tokens;
 
-  function renderModule(key: string): ReactNode {
-    /* 自定义模块使用专用组件渲染 */
+  function renderModule(key: string, t: StyleTokens): ReactNode {
     if (isCustomModule(key)) {
       return (
         <div key={key} className="resume-module" data-module-key={key}>
-          <CustomModule moduleId={key} config={config} tokens={tokens} />
+          <CustomModule moduleId={key} config={config} tokens={t} />
         </div>
       );
     }
@@ -55,14 +55,14 @@ export function useTemplateModules(
     if (!Mod) return null;
     return (
       <div key={key} className="resume-module" data-module-key={key}>
-        <Mod config={config} tokens={tokens} />
+        <Mod config={config} tokens={t} />
       </div>
     );
   }
 
   return {
-    sidebarContent: <>{layout.sidebar.map((k) => renderModule(k))}</>,
-    mainContent: <>{layout.main.map((k) => renderModule(k))}</>,
+    sidebarContent: <>{layout.sidebar.map((k) => renderModule(k, sidebarTokens))}</>,
+    mainContent: <>{layout.main.map((k) => renderModule(k, tokens))}</>,
   };
 }
 

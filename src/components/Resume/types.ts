@@ -56,6 +56,8 @@ export interface TemplateDefinition {
   /** 默认模块布局：sidebar 和 main 各放哪些模块（不含 profile） */
   defaultLayout: ModuleLayout;
   getTokens: () => StyleTokens;
+  /** 侧栏专用 tokens，未提供时回退到 getTokens() */
+  getSidebarTokens?: () => StyleTokens;
   LayoutShell: ComponentType<LayoutShellProps>;
 }
 
