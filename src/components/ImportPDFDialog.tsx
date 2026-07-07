@@ -163,16 +163,12 @@ export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
       if (isStale()) return;
 
       // 阶段 2：调用 AI 解析
-      // 硅基流动固定使用 Qwen2.5-7B-Instruct，该模型对结构化简历解析效果最稳定
-      const pdfModel = activeProviderId === 'siliconflow'
-        ? 'Qwen/Qwen2.5-7B-Instruct'
-        : providerConfig.selectedModel;
       setState({ step: 'calling-ai' });
       const aiResponse = await generateText(
         {
           apiKey: providerConfig.apiKey,
           apiUrl: providerConfig.apiUrl,
-          model: pdfModel,
+          model: providerConfig.selectedModel,
         },
         [
           { role: 'system', content: SYSTEM_PROMPT },
