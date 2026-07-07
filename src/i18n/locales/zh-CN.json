@@ -277,7 +277,7 @@
     "stepAIActive": "AI 智能解析中...",
     "stepAIDone": "已完成 AI 解析",
     "stepAIPending": "等待 AI 解析",
-    "stepAIHint": "预计需要 10-15 秒，请稍候...",
+    "stepAIHint": "预计需要 30 秒，请稍候...",
     "stepMappingActive": "正在处理数据...",
     "stepMappingDone": "已完成数据处理",
     "stepMappingPending": "等待处理数据",

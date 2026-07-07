@@ -277,7 +277,7 @@
     "stepAIActive": "AI smart parsing...",
     "stepAIDone": "AI parsing completed",
     "stepAIPending": "Waiting for AI parsing",
-    "stepAIHint": "This may take 10-15 seconds...",
+    "stepAIHint": "This may take 30 seconds...",
     "stepMappingActive": "Processing data...",
     "stepMappingDone": "Data processing completed",
     "stepMappingPending": "Waiting to process data",
