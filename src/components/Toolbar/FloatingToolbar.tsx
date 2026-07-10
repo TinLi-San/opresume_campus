@@ -29,13 +29,18 @@ export function FloatingToolbar() {
   const handlePrint = useCallback(() => {
     if (printingRef.current) return;
     printingRef.current = true;
-    requestIdleCallback(
-      () => {
-        window.print();
-        printingRef.current = false;
-      },
-      { timeout: 100 }
-    );
+
+    const callback = () => {
+      window.print();
+      printingRef.current = false;
+    };
+
+    // Safari 不支持 requestIdleCallback，降级为 setTimeout
+    if (typeof requestIdleCallback !== 'undefined') {
+      requestIdleCallback(callback, { timeout: 100 });
+    } else {
+      setTimeout(callback, 0);
+    }
   }, []);
 
   return (
@@ -51,7 +56,10 @@ export function FloatingToolbar() {
         className="fixed right-4 top-1/2 z-40 flex flex-col gap-1 rounded-2xl border bg-white/90 p-1.5 shadow-lg backdrop-blur print:hidden"
         // 用 style 写 translateY(-50%)：framer-motion 的 y 会和这个 transform 冲突，
         // 因此入场用 x 而非 y，且垂直居中靠 style.top + transform 完成（不靠 -translate-y-1/2 类）。
-        style={{ translateY: '-50%' }}
+        style={{
+          translateY: '-50%',
+          right: 'calc(1rem + var(--removed-body-scroll-bar-size, 0px))'
+        }}
         initial={
           reduceMotion ? { opacity: 0 } : { opacity: 0, x: 36, scale: 0.94 }
         }
