@@ -156,13 +156,15 @@ function formatChineseMobileInput(value: string): string {
 }
 
 /** 年月选择器（Popover + 年份下拉 + 月份网格） */
-function MonthPicker({ value, onChange, placeholder, minYear, minMonth, showPresent }: {
+function MonthPicker({ value, onChange, placeholder, minYear, minMonth, maxFutureYears = 0, showPresent }: {
   value: string;
   onChange: (v: string) => void;
   placeholder: string;
   minYear?: number | null;
   /** 仅当 viewYear === minYear 时生效，1-12 */
   minMonth?: number | null;
+  /** 可选择的未来年数，允许上限年份的所有月份 */
+  maxFutureYears?: number;
   showPresent?: boolean;
 }) {
   const { t, i18n } = useTranslation();
@@ -176,6 +178,7 @@ function MonthPicker({ value, onChange, placeholder, minYear, minMonth, showPres
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
+  const maxYear = currentYear + maxFutureYears;
   const floor = minYear ?? 1970;
 
   const [viewYear, setViewYear] = useState(() => selectedYear ?? currentYear);
@@ -202,8 +205,8 @@ function MonthPicker({ value, onChange, placeholder, minYear, minMonth, showPres
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {Array.from({ length: currentYear - floor + 1 }, (_, i) => {
-                const y = currentYear - i;
+              {Array.from({ length: maxYear - floor + 1 }, (_, i) => {
+                const y = maxYear - i;
                 return (
                   <SelectItem key={y} value={String(y)}>{y}</SelectItem>
                 );
@@ -216,7 +219,8 @@ function MonthPicker({ value, onChange, placeholder, minYear, minMonth, showPres
           {months.map((name, i) => {
             const m = i + 1;
             const isSelected = selectedYear === viewYear && selectedMonth === m;
-            const isFuture = viewYear === currentYear && m > currentMonth;
+            const isAfterMax = viewYear > maxYear
+              || (maxFutureYears === 0 && viewYear === maxYear && m > currentMonth);
             const isBelowMin = viewYear < floor;
             const isBeforeMin = viewYear === floor && !!minMonth && m < minMonth;
             return (
@@ -225,7 +229,7 @@ function MonthPicker({ value, onChange, placeholder, minYear, minMonth, showPres
                 variant={isSelected ? 'default' : 'ghost'}
                 size="sm"
                 className={cn('text-xs', isSelected && 'pointer-events-none')}
-                disabled={isFuture || isBelowMin || isBeforeMin}
+                disabled={isAfterMax || isBelowMin || isBeforeMin}
                 onClick={() => {
                   onChange(`${viewYear}-${String(m).padStart(2, '0')}`);
                   setOpen(false);
@@ -293,6 +297,7 @@ function TimeRangeField({ field, value, onChange }: FormFieldProps) {
             placeholder={t('field.endTime')}
             minYear={endMinYear}
             minMonth={endMinMonth}
+            maxFutureYears={field.endFutureYears}
             showPresent={field.showPresent}
           />
         </div>

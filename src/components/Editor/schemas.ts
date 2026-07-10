@@ -7,6 +7,8 @@ export interface FieldDef {
   options?: { labelKey: string; value: string }[];
   /** 时间范围结束日期是否显示「至今」选项 */
   showPresent?: boolean;
+  /** 时间范围结束日期允许选择的未来年数 */
+  endFutureYears?: number;
   /** 字段图标名（lucide 图标） */
   icon?: string;
   /** 隐藏字段标签（适用于单字段模块，标签与模块标题重复时） */
@@ -61,7 +63,7 @@ export const schemas: ModuleSchema[] = [
       { key: 'institution', labelKey: 'field.school', type: 'text' },
       { key: 'area', labelKey: 'field.major', type: 'text' },
       { key: 'studyType', labelKey: 'field.academicDegree', type: 'text' },
-      { key: 'startDate', labelKey: 'field.eduTime', type: 'time-range', endKey: 'endDate' },
+      { key: 'startDate', labelKey: 'field.eduTime', type: 'time-range', endKey: 'endDate', endFutureYears: 5 },
     ],
     defaultItem: () => ({ 'x-op-id': uid('edu'), institution: '', area: '', studyType: '', startDate: '', endDate: '' }),
   },
