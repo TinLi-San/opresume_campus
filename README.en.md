@@ -139,12 +139,12 @@ src/
 
 <div align="center">
 
-<a href="https://star-history.com/#oopooa/opresume&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=oopooa/opresume&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=oopooa/opresume&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=oopooa/opresume&type=Date" />
-  </picture>
+<a href="https://www.star-history.com/?repos=oopooa%2Fopresume&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&theme=dark&legend=top-left&sealed_token=LR4NhJGINXO5AWveM9iJQhygrT6vtFYIQktrTHvftyK1JfvY5Nbg3_zHPkR9yeDb_uplPmqHIGK3WU3h8RLk5EnqBnkbqC6LxbfZTJjNdrT7BSQsLlr-Jw" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=LR4NhJGINXO5AWveM9iJQhygrT6vtFYIQktrTHvftyK1JfvY5Nbg3_zHPkR9yeDb_uplPmqHIGK3WU3h8RLk5EnqBnkbqC6LxbfZTJjNdrT7BSQsLlr-Jw" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=LR4NhJGINXO5AWveM9iJQhygrT6vtFYIQktrTHvftyK1JfvY5Nbg3_zHPkR9yeDb_uplPmqHIGK3WU3h8RLk5EnqBnkbqC6LxbfZTJjNdrT7BSQsLlr-Jw" />
+ </picture>
 </a>
 
 </div>
