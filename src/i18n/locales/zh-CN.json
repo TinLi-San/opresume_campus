@@ -67,7 +67,7 @@
     "importWarningDesc": "此操作不可撤销。建议在导入前先备份现有数据。",
     "importConfirm": "确认覆盖",
     "importSuccess": "导入成功",
-    "importFormatError": "JSON 格式不符合简历数据规范",
+    "importFormatError": "仅支持导入本应用导出的 JSON 文件",
     "importParseFailed": "JSON 解析失败",
     "clearData": "清空数据",
     "clearWarning": "确认清空当前简历数据？",

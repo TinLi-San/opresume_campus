@@ -46,6 +46,29 @@ function isJsonResume(data: unknown): data is JsonResume {
   return 'basics' in obj || 'work' in obj || 'education' in obj;
 }
 
+function isRecord(data: unknown): data is Record<string, unknown> {
+  return Boolean(data) && typeof data === 'object' && !Array.isArray(data);
+}
+
+/**
+ * 导入仅接受 OpResume 导出的备份文件。opresumeVersion 仅由导出流程写入，
+ * 用于识别文件来源，而非用于对外部数据做完整的 schema 校验。
+ */
+function isOpResumeExport(data: unknown): data is JsonResume & { opresumeVersion: string } {
+  return isRecord(data)
+    && typeof data.opresumeVersion === 'string'
+    && data.opresumeVersion.length > 0;
+}
+
+export type ResumeImportErrorCode = 'invalid-format' | 'parse-failed';
+
+export class ResumeImportError extends Error {
+  constructor(public readonly code: ResumeImportErrorCode) {
+    super(code);
+    this.name = 'ResumeImportError';
+  }
+}
+
 export async function loadResume(lang?: string): Promise<JsonResume> {
   // Demo 模式：直接返回对应语言的示例数据，忽略所有其他数据源
   if (isDemoMode()) {
@@ -137,14 +160,15 @@ export function importResume(file: File): Promise<JsonResume> {
     const reader = new FileReader();
     reader.onload = () => {
       try {
-        const { opresumeVersion: _, ...data } = JSON.parse(reader.result as string);
-        if (isJsonResume(data)) {
-          resolve(addCustomFieldIds(data));
+        const exportedData: unknown = JSON.parse(reader.result as string);
+        if (isOpResumeExport(exportedData)) {
+          const { opresumeVersion: _, ...resume } = exportedData;
+          resolve(addCustomFieldIds(resume));
         } else {
-          reject(new Error('不支持的数据格式'));
+          reject(new ResumeImportError('invalid-format'));
         }
       } catch {
-        reject(new Error('JSON 解析失败'));
+        reject(new ResumeImportError('parse-failed'));
       }
     };
     reader.onerror = () => reject(reader.error);

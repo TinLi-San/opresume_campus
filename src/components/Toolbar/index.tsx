@@ -6,7 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/store/ui';
 import { useResumeStore } from '@/store/resume';
-import { exportResume, importResume } from '@/services/resume';
+import { exportResume, importResume, ResumeImportError } from '@/services/resume';
 import {
   Tooltip,
   TooltipContent,
@@ -110,8 +110,12 @@ export function Toolbar() {
       update(extended);
       await save();
       toast.success(t('toolbar.importSuccess'));
-    } catch {
-      toast.error(t('toolbar.importParseFailed'));
+    } catch (error) {
+      toast.error(
+        error instanceof ResumeImportError && error.code === 'invalid-format'
+          ? t('toolbar.importFormatError')
+          : t('toolbar.importParseFailed'),
+      );
     } finally {
       setPendingFile(null);
     }

@@ -67,7 +67,7 @@
     "importWarningDesc": "This action cannot be undone. Please back up your existing data before proceeding.",
     "importConfirm": "Confirm Overwrite",
     "importSuccess": "Imported successfully",
-    "importFormatError": "JSON format does not match resume data schema",
+    "importFormatError": "Only JSON files exported from this app can be imported.",
     "importParseFailed": "Failed to parse JSON",
     "clearData": "Clear Data",
     "clearWarning": "Clear current resume data?",
