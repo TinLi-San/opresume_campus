@@ -141,9 +141,9 @@ src/
 
 <a href="https://www.star-history.com/?repos=oopooa%2Fopresume&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&theme=dark&legend=top-left&sealed_token=LR4NhJGINXO5AWveM9iJQhygrT6vtFYIQktrTHvftyK1JfvY5Nbg3_zHPkR9yeDb_uplPmqHIGK3WU3h8RLk5EnqBnkbqC6LxbfZTJjNdrT7BSQsLlr-Jw" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=LR4NhJGINXO5AWveM9iJQhygrT6vtFYIQktrTHvftyK1JfvY5Nbg3_zHPkR9yeDb_uplPmqHIGK3WU3h8RLk5EnqBnkbqC6LxbfZTJjNdrT7BSQsLlr-Jw" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=LR4NhJGINXO5AWveM9iJQhygrT6vtFYIQktrTHvftyK1JfvY5Nbg3_zHPkR9yeDb_uplPmqHIGK3WU3h8RLk5EnqBnkbqC6LxbfZTJjNdrT7BSQsLlr-Jw" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&theme=dark&legend=top-left&sealed_token=8ZQ8VIV2gHILeT724qeK8LleA83fLyqrVo3Q4u3hbia8Z-Zg6qS-pfIedfjfKqn6in-MBxxcpQk46YF-ZFhd5he4sXq5t7CwBbCy3MIA-tZSBxq8p5T70VRQHZ_BnKkG7O6KDzkPmreqs5IVEo4VvPjoyBHsnexRDfQuH-uGRawZSQiZlt4tif9g7jNC" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=8ZQ8VIV2gHILeT724qeK8LleA83fLyqrVo3Q4u3hbia8Z-Zg6qS-pfIedfjfKqn6in-MBxxcpQk46YF-ZFhd5he4sXq5t7CwBbCy3MIA-tZSBxq8p5T70VRQHZ_BnKkG7O6KDzkPmreqs5IVEo4VvPjoyBHsnexRDfQuH-uGRawZSQiZlt4tif9g7jNC" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=8ZQ8VIV2gHILeT724qeK8LleA83fLyqrVo3Q4u3hbia8Z-Zg6qS-pfIedfjfKqn6in-MBxxcpQk46YF-ZFhd5he4sXq5t7CwBbCy3MIA-tZSBxq8p5T70VRQHZ_BnKkG7O6KDzkPmreqs5IVEo4VvPjoyBHsnexRDfQuH-uGRawZSQiZlt4tif9g7jNC" />
  </picture>
 </a>
 
