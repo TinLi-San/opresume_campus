@@ -153,6 +153,16 @@
   .resume-measure-container {
     display: none;
   }
+
+  /* 打印时隐藏编辑器浮层/提示（即使漏标 print:hidden 也不会进 PDF）：
+     - sonner 保存/错误 toast（fixed 容器）
+     - Radix 弹窗/浮层（content 挂载在 portal） */
+  [data-sonner-toaster],
+  [data-sonner-toast],
+  [data-radix-popper-content-wrapper],
+  [role="dialog"] {
+    display: none !important;
+  }
 }
 
 /* 富文本渲染样式（简历预览和打印） */
@@ -267,4 +277,561 @@ div.resume-layout a {
   top: 0;
   visibility: hidden;
   pointer-events: none;
+}
+/* ======================================================================
+ * Campus Fresh Graduate（校园应届生）模板（template7）专用样式 — 复刻《DHU_CV_Template.pdf》紧凑单页版
+ *
+ * 版式参数直接对照《DHU_CV_Template.pdf》原件逐项还原（渲染由 React/CSS 引擎完成，不再经由 LaTeX）：
+ * - 页边距：左右 12mm、上 12mm、下 14mm（页脚主题色横条 3.8mm 贴纸底）
+ * - 正文 10.3pt（≈14px）、行距 1.3（紧凑一页）
+ * - 姓名 16.5pt（≈22px）、章节标题 12pt（≈16px）
+ * - 章节：主题色 Lucide 模块图标 + 黑色加粗标题 + 主题色细分隔线
+ * - 要点：黑色圆点（与 DHU 原稿一致）
+ * - 主体色：--campus-primary，由模板从校徽主色提取（回退 #A9021F）
+ * ====================================================================== */
+
+.campus-resume {
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'PingFang SC',
+    'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+  --campus-primary: #a9021f;
+  --campus-ink: #1b1c1e;
+  /* 版式（页边距/模块间距/行高/字号）全部跟随编辑器「外观」里的全局排版设置：
+     不在此处覆盖 --resume-* 变量（与其他模板一致），保证编辑区调整即时生效。 */
+  color: var(--campus-ink);
+  font-size: min(var(--resume-body-size, 14px), 13px); /* 单页硬保证：正文上限 13px（紧凑单页版） */
+  /* 单页硬保证：行距上限按 DHU 原模板比例（10.9pt/14.6pt ≈ 1.34），
+     即使用户把全局行距调大，也压回紧凑比例 */
+  line-height: min(var(--resume-line-height, 1.5), 1.28);
+}
+
+/* 楷体标注（描述：/主要工作：/学历） */
+.campus-resume .campus-kai {
+  font-family: 'LXGW WenKai', 'Kaiti SC', 'STKaiti', 'KaiTi', 'FandolKai', serif;
+  letter-spacing: 0.02em;
+}
+
+/* ---------- 页边距：跟随编辑器「外观→页边距」的全局设置（--resume-page-padding-y/x） ---------- */
+.campus-resume .resume-padding {
+  /* 单页硬保证：上下内边距上限 11mm（DHU 原件上 12/下 14），页边距选“宽”也被压回 */
+  padding: min(var(--resume-page-padding-y), 11mm) var(--resume-page-padding-x);
+}
+
+/* ---------- 顶部：校徽 / 证件照（绝对定位，相对整页 A4） ---------- */
+.campus-logo {
+  position: absolute;
+  left: 4.3mm;
+  top: 4.6mm;
+  height: 13mm; /* 校徽尺寸：18mm 偏大、11mm 偏小，取中间值 13mm */
+  width: auto;
+  max-width: 80mm;
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+  z-index: 1;
+}
+
+.campus-logo-img {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* 未上传校徽时的可点击占位区 */
+.campus-logo.campus-logo-placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32mm;
+  height: 20mm;
+  border: 1.5px dashed color-mix(in srgb, var(--campus-primary) 35%, #cbd5e1);
+  border-radius: 6px;
+  background: #fafafa;
+  color: color-mix(in srgb, var(--campus-primary) 70%, #475569);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.campus-logo.campus-logo-placeholder:hover {
+  border-color: var(--campus-primary);
+  background: color-mix(in srgb, var(--campus-primary) 6%, white);
+}
+
+/* 已上传校徽 / 证件照：点击打开 Profile 编辑器 */
+.campus-editable-image {
+  cursor: pointer;
+  padding: 0;
+  border: none;
+  background: transparent;
+  transition: box-shadow 0.15s ease;
+}
+
+.campus-editable-image:hover {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--campus-primary) 40%, transparent);
+}
+
+@media print {
+  .campus-editable-image {
+    box-shadow: none !important;
+  }
+}
+
+.campus-logo-placeholder-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1mm;
+}
+
+.campus-logo-placeholder-text {
+  font-size: 10px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.campus-photo {
+  position: absolute;
+  right: 12mm;
+  top: 6mm;
+  width: 20mm;
+  height: 26.7mm;
+  object-fit: cover;
+  z-index: 1;
+  border: 0.5px solid #cfcfcf;
+  background: #f6f6f6;
+}
+
+.campus-photo-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- 头部：姓名 + 联系信息（居中） ---------- */
+.campus-header {
+  margin-top: 3mm; /* 参照 DHU 模板，顶部留白适中（单页硬保证收紧） */
+  margin-bottom: 1.4mm;
+  text-align: center;
+}
+
+.campus-header-name-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 2mm 3mm;
+  margin-bottom: 0.4mm;
+}
+
+.campus-header-name-row .campus-name {
+  margin-bottom: 0;
+}
+
+.campus-name {
+  font-size: calc(var(--resume-title-size, 16px) * 1.45); /* ≈17pt（16px×1.45≈23px），跟随全局标题字号 */
+  font-weight: 700;
+  color: #000;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  margin-bottom: 0.4mm;
+}
+
+/* 姓名下的“应聘岗位”，字体形式与项目角色保持一致 */
+.campus-header-role-line {
+  margin-bottom: 0.4mm;
+}
+
+.campus-header-role {
+  color: #46474a;
+  font-size: var(--resume-body-size, 14px);
+  white-space: nowrap;
+}
+
+.campus-contact {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6mm 5mm;
+  margin-bottom: 0.4mm;
+  font-size: var(--resume-body-size, 14px);
+  color: #38393c;
+}
+
+.campus-header > .campus-contact:last-child {
+  margin-bottom: 0;
+}
+
+.campus-contact-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.2mm;
+  white-space: nowrap;
+}
+
+.campus-contact-custom {
+  gap: 2mm; /* 自定义字段：键值对之间留稍宽间距 */
+}
+
+.campus-contact-icon {
+  color: var(--campus-primary);
+  width: 1em;
+  text-align: center;
+}
+
+.campus-contact-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.campus-contact-link:hover {
+  text-decoration: underline;
+}
+
+/* 模块间距：共享模块与覆盖模块统一使用 --resume-module-gap。
+   注意：EditableSection 会给每个模块再包一层 div，section 在该包装内是唯一子元素，
+   不能简单地用 :last-child 把间距清零，否则模块间距永远不会生效。
+   这里显式让每个 resume-module 内的 campus-section 使用全局模块间距，
+   仅让整个简历的最后一个 resume-module 不占间距。 */
+.campus-section,
+.campus-section-space {
+  /* 单页硬保证：模块间距上限 18px（标准 24px / 宽 32px 都被收敛），
+     即使编辑器里选择“宽间距”也保持一页 A4 */
+  margin-bottom: min(var(--resume-module-gap), 18px);
+}
+
+.campus-resume .resume-module > div > .campus-section,
+.campus-resume .resume-module > div > .campus-section-space {
+  margin-bottom: min(var(--resume-module-gap), 26px);
+}
+
+.campus-resume .resume-module:last-child > div > .campus-section,
+.campus-resume .resume-module:last-child > div > .campus-section-space {
+  margin-bottom: 0;
+}
+
+.campus-item-space {
+  margin-bottom: 0.5mm;
+}
+
+/* ---------- 章节标题：主题色图标 + 加粗标题 + 主题色细线 ---------- */
+.campus-section-title {
+  margin-bottom: 0.5mm;
+}
+
+.campus-section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 2mm;
+  padding-bottom: 0.6mm;
+  position: relative;
+}
+
+/* 色条细线：改用伪元素替代 border-bottom（预览仍为 0.5pt 发丝线）。
+   Chromium 导出 PDF 时会把 <1px 的 border 钳制为 1px（约 0.75pt），
+   导致下载的 PDF 里线条比预览粗；打印态加 transform 缩放可精确还原 0.5pt。 */
+.campus-section-title-row::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0.5pt; /* ≈0.667px，与原来 border 0.5pt 的预览效果一致 */
+  background: var(--campus-primary);
+}
+
+@media print {
+  .campus-section-title-row::after {
+    transform: scaleY(0.667); /* 打印钳制 1px(0.75pt) 后缩回真实 0.5pt */
+    transform-origin: 100% 100%;
+  }
+}
+
+.campus-section-icon {
+  color: var(--campus-primary);
+  flex-shrink: 0;
+}
+
+.campus-section-title-text {
+  font-size: min(var(--resume-title-size, 16px), 13.5px); /* ≈12pt，跟随全局标题字号，单页硬保证上限 13.5px */
+  font-weight: 800; /* 对照 DHU 原稿标题黑体：加粗显厚重（原 700 偏窄偏细） */
+  color: #000;
+  letter-spacing: 0.03em;
+  margin: 0;
+}
+
+/* ---------- 条目排版（紧凑） ---------- */
+.campus-item {
+  margin-bottom: 0.15mm;
+}
+
+.campus-education.campus-item {
+  margin-bottom: 0.5mm;
+}
+
+.campus-education.campus-item:last-child {
+  margin-bottom: 0;
+}
+
+.campus-item:last-child {
+  margin-bottom: 0;
+}
+
+.campus-item-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 3mm;
+}
+
+/* 项目/工作经历标题行：左（名称/职位）+ 中（角色/公司）+ 右（时间），中间整体居中 */
+.campus-item-head-with-role {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 3mm;
+}
+
+.campus-item-head-with-role .campus-head-left {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5mm;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.campus-item-head-with-role .campus-head-center {
+  justify-self: center;
+  text-align: center;
+  white-space: nowrap;
+  padding: 0 2mm;
+}
+
+.campus-item-head-with-role .campus-head-right {
+  justify-self: end;
+  grid-column: 3;
+}
+
+.campus-bold {
+  font-weight: 700;
+  color: #000;
+}
+
+.campus-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.campus-role {
+  margin: 0 auto; /* 标题行中间的“角色/公司”，左右留白自动居中 */
+  text-align: center;
+  color: #46474a;
+  padding: 0 2mm;
+}
+
+.campus-date {
+  color: #3d3e41;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.campus-item-sub {
+  display: block;
+  margin-top: 0.15mm;
+  padding-left: 3.5mm; /* 与正文缩进一致 */
+}
+
+.campus-item-sub > .campus-kai,
+.campus-item-sub > .campus-plain,
+.campus-item-sub > .campus-rich {
+  display: inline;
+}
+
+/* 工作经历：公司/岗位标题行与具体描述之间，与项目经历的段间距保持一致 */
+.campus-item:not(.campus-project-item) > .campus-rich {
+  margin-top: 0.15mm;
+}
+
+/* 项目经历「主要工作：」后保留一个空格 */
+.campus-project-works-sub > .campus-kai::after {
+  content: " ";
+  white-space: pre;
+}
+
+.campus-education .campus-item-sub {
+  margin-top: 0.2mm;
+  padding-left: 7mm; /* 教育经历第二行更深缩进（原模板 21.8pt） */
+}
+
+.campus-plain {
+  color: #2a2b2e;
+}
+
+/* 修读课程 / 专业技能：黑色圆点要点（与 DHU 原稿一致） */
+.campus-bullet {
+  display: flex;
+  align-items: baseline;
+  gap: 2mm;
+  margin-top: 0.15mm;
+  margin-bottom: 0.2mm;
+  padding-left: 0.8mm;
+}
+
+.campus-bullet:last-child {
+  margin-bottom: 0;
+}
+
+.campus-bullet-dot {
+  color: #1b1c1e;
+  font-size: 12px;
+  line-height: 1;
+  width: 1em;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.campus-bullet-text {
+  color: #2a2b2e;
+}
+
+/* 实践经验：标题行前黑色圆点 */
+.campus-project-item .campus-item-head {
+  gap: 1.5mm;
+}
+
+.campus-project-dot {
+  color: #1b1c1e;
+  font-size: 12px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.campus-muted {
+  color: #8a8b8e;
+}
+
+/* 富文本要点（工作/项目正文）：无序列表 → 黑色圆点；有序列表 → 黑色编号 */
+.campus-resume .rich-content ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.campus-resume .rich-content ul li {
+  position: relative;
+  padding-left: 3.4mm;
+  margin: 0;
+}
+
+.campus-resume .rich-content ul li::before {
+  content: "•";
+  color: #1b1c1e;
+  font-size: 0.95em;
+  position: absolute;
+  left: 0;
+  top: -0.05em;
+}
+
+.campus-resume .rich-content ol {
+  padding-left: 4.5mm;
+  margin: 0;
+}
+
+.campus-resume .rich-content ol li {
+  margin: 0;
+}
+
+.campus-resume .rich-content ol li::marker {
+  color: #1b1c1e;
+}
+
+/* 项目经历「主要工作」：阿拉伯数字编号（1、2、3），行内自然段落，项间 1-2 空格 */
+.campus-resume .campus-project-works {
+  display: inline;
+}
+
+.campus-resume .campus-project-works .rich-content {
+  display: inline;
+}
+
+.campus-resume .campus-project-works .rich-content ol,
+.campus-resume .campus-project-works .rich-content ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  counter-reset: dhu-work;
+  display: inline;
+}
+
+.campus-resume .campus-project-works .rich-content ol li,
+.campus-resume .campus-project-works .rich-content ul li {
+  display: inline;
+  padding-left: 0;
+  margin: 0;
+  counter-increment: dhu-work;
+}
+
+.campus-resume .campus-project-works .rich-content ol li > p,
+.campus-resume .campus-project-works .rich-content ul li > p {
+  display: inline;
+  padding-left: 0;
+  margin: 0;
+}
+
+.campus-resume .campus-project-works .rich-content ol li::before,
+.campus-resume .campus-project-works .rich-content ul li::before {
+  content: counter(dhu-work) ".";
+  position: static;
+  margin-right: 0.15em;
+  color: #1b1c1e;
+}
+
+.campus-resume .campus-project-works .rich-content ol li::after,
+.campus-resume .campus-project-works .rich-content ul li::after {
+  content: "  ";
+  white-space: pre;
+}
+
+.campus-resume .campus-project-works .rich-content ol li::marker,
+.campus-resume .campus-project-works .rich-content ul li::marker {
+  content: none;
+}
+
+.campus-resume .rich-content p {
+  margin: 0 0 0.15mm;
+}
+
+.campus-resume .rich-content p:last-child {
+  margin-bottom: 0;
+}
+
+.campus-resume .rich-content ul li + li,
+.campus-resume .rich-content ol li + li {
+  margin-top: 0.1mm;
+}
+
+/* 文本换行控制辅助类 */
+.campus-nowrap {
+  white-space: nowrap;
+}
+
+/* ---------- 页脚主体色横条 ---------- */
+.campus-footer-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3.8mm;
+  background: var(--campus-primary);
+}
+
+/* 打印时保留主体色 */
+.campus-resume,
+.campus-footer-bar,
+.campus-section-title-row,
+.campus-section-title-row::after {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
