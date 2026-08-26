@@ -2,6 +2,19 @@
 
 
 
+## v1.6.0 (2026-08-27)
+
+### ✨ 新功能 (Features)
+
+* 默认模板切换为校园应届生单栏模板（Template 7 / Campus Fresh Graduate），并移除基础信息中的专业排名
+* AI 支持更多供应商与自定义 OpenAI 兼容端点（DeepSeek、Qwen、Moonshot、MiniMax、Mimo、OpenCode 等）
+* 新增校徽编辑器（School Logo Editor）
+* 部署至 Vercel：https://opresume.vercel.app （修复 /editor 路由 404）
+
+### 🧪 测试 (Tests)
+
+* 新增 PDF 导入测试脚本与测试夹具
+
 ## v1.5.3 (2026-07-16)
 
 ### 🐛 Bug 修复 (Bug Fixes)
