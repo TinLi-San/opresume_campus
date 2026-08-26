@@ -12,7 +12,7 @@
 
 [简体中文](./README.md) | English
 
-**[👉 Get Started](https://opresume.pages.dev)**
+**[👉 Get Started](https://opresume.vercel.app)**
 
 <img src="docs/images/mockup.webp" alt="OpResume Preview" width="800" />
 
