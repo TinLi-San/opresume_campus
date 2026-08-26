@@ -141,12 +141,11 @@ src/
 
 <a href="https://www.star-history.com/?repos=oopooa%2Fopresume&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&theme=dark&legend=top-left&sealed_token=8ZQ8VIV2gHILeT724qeK8LleA83fLyqrVo3Q4u3hbia8Z-Zg6qS-pfIedfjfKqn6in-MBxxcpQk46YF-ZFhd5he4sXq5t7CwBbCy3MIA-tZSBxq8p5T70VRQHZ_BnKkG7O6KDzkPmreqs5IVEo4VvPjoyBHsnexRDfQuH-uGRawZSQiZlt4tif9g7jNC" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=8ZQ8VIV2gHILeT724qeK8LleA83fLyqrVo3Q4u3hbia8Z-Zg6qS-pfIedfjfKqn6in-MBxxcpQk46YF-ZFhd5he4sXq5t7CwBbCy3MIA-tZSBxq8p5T70VRQHZ_BnKkG7O6KDzkPmreqs5IVEo4VvPjoyBHsnexRDfQuH-uGRawZSQiZlt4tif9g7jNC" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=8ZQ8VIV2gHILeT724qeK8LleA83fLyqrVo3Q4u3hbia8Z-Zg6qS-pfIedfjfKqn6in-MBxxcpQk46YF-ZFhd5he4sXq5t7CwBbCy3MIA-tZSBxq8p5T70VRQHZ_BnKkG7O6KDzkPmreqs5IVEo4VvPjoyBHsnexRDfQuH-uGRawZSQiZlt4tif9g7jNC" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&theme=dark&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
  </picture>
 </a>
-
 </div>
 
 ---
