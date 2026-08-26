@@ -133,12 +133,7 @@
     "borderRadius": 0
   },
   "x-op-aboutmeHtml": "<ul><li><p>机械设计基础扎实，可独立完成从方案设计、三维建模到工程图输出的完整流程；</p></li><li><p>具备机械创新竞赛、创新创业项目与智能装备企业实习的完整实践链路，动手调试能力强；</p></li><li><p>学习能力强、注重细节，团队协作与沟通表达良好。</p></li></ul>",
-  "x-op-customFields": [
-    {
-      "key": "专业排名",
-      "value": "前 20%"
-    }
-  ],
+  "x-op-customFields": [],
   "x-op-moduleLayout": {
     "template7": {
       "sidebar": [],
