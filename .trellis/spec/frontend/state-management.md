@@ -58,7 +58,7 @@ interface UIStore {
   layout: LayoutConfig;
   showIcons: boolean;
   privacyMode: boolean;
-  settingsPanelOpen: boolean;
+  menuPanelOpen: boolean;
   
   setTemplate: (id: string) => void;
   openEditor: (module?: string) => void;

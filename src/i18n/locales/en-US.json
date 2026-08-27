@@ -12,6 +12,7 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "close": "Close",
+    "menu": "Menu",
     "delete": "Delete",
     "confirmDelete": "Confirm Delete",
     "deleteHint": "Are you sure you want to delete <bold>{{name}}</bold>?",
@@ -26,6 +27,9 @@
     "workExpCalc": "Auto-calculated: {{years}} yrs {{months}} mos",
     "workExpCalcYearOnly": "Auto-calculated: {{years}} yrs",
     "workExpCalcMonthOnly": "Auto-calculated: <1 yr"
+  },
+  "menu": {
+    "description": "Navigation menu"
   },
   "toolbar": {
     "template": "Template",

@@ -12,6 +12,7 @@
     "cancel": "取消",
     "confirm": "确认",
     "close": "关闭",
+    "menu": "菜单",
     "delete": "删除",
     "confirmDelete": "确认删除",
     "deleteHint": "确定要删除 <bold>{{name}}</bold> 吗？",
@@ -26,6 +27,9 @@
     "workExpCalc": "自动推算：{{years}}年{{months}}个月",
     "workExpCalcYearOnly": "自动推算：{{years}}年",
     "workExpCalcMonthOnly": "自动推算：不足1年"
+  },
+  "menu": {
+    "description": "导航菜单"
   },
   "toolbar": {
     "template": "模板",

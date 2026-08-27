@@ -22,8 +22,8 @@ interface UIStore {
   privacyMode: boolean;
   /** 排版配置 */
   layout: LayoutConfig;
-  /** 设置面板开关状态 */
-  settingsPanelOpen: boolean;
+  /** 一级菜单面板开关状态 */
+  menuPanelOpen: boolean;
   /** 当前正在配置的供应商 ID（Dialog 打开时） */
   editingProviderId: AIProviderId | null;
   /** 页面级润色对话框状态 */
@@ -65,8 +65,8 @@ interface UIStore {
   setTitleFontSize: (value: number) => void;
   setBodyFontSize: (value: number) => void;
   setLineHeight: (value: number) => void;
-  openSettingsPanel: () => void;
-  closeSettingsPanel: () => void;
+  openMenuPanel: () => void;
+  closeMenuPanel: () => void;
   openProviderConfig: (providerId: AIProviderId) => void;
   closeProviderConfig: () => void;
 }
@@ -85,7 +85,7 @@ export const useUIStore = create<UIStore>()(
       showIcons: true,
       privacyMode: false,
       layout: { pageMargin: 'standard', moduleGap: 'standard', titleFontSize: 16, bodyFontSize: 14, lineHeight: 1.5 },
-      settingsPanelOpen: false,
+      menuPanelOpen: false,
       editingProviderId: null,
       polishDialog: null,
 
@@ -148,8 +148,8 @@ export const useUIStore = create<UIStore>()(
       setLineHeight: (value) =>
         set((s) => ({ layout: { ...s.layout, lineHeight: value } })),
 
-      openSettingsPanel: () => set({ settingsPanelOpen: true }),
-      closeSettingsPanel: () => set({ settingsPanelOpen: false }),
+      openMenuPanel: () => set({ menuPanelOpen: true }),
+      closeMenuPanel: () => set({ menuPanelOpen: false }),
       openProviderConfig: (providerId) => set({ editingProviderId: providerId }),
       closeProviderConfig: () => set({ editingProviderId: null }),
     }),
