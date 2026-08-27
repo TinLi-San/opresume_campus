@@ -156,22 +156,15 @@ src/
 
 ---
 
-## ⭐ Star History（上游项目）
+## 👥 作者与致谢
 
-<div align="center">
-
-<a href="https://www.star-history.com/?repos=oopooa%2Fopresume&type=date&legend=top-left">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&theme=dark&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
-    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
-  </picture>
-</a>
-
-</div>
+- **维护者**：[TinLi-San](https://github.com/TinLi-San) — 本 Fork 的新增功能与维护（校园应届生模板、校徽编辑器、AI 多供应商、测试保障、Vercel 部署）
+- **上游项目**：[oopooa/opresume](https://github.com/oopooa/opresume)（[MIT](LICENSE)）— 本仓库的基础，感谢原作者的开源贡献
 
 ---
 
 ## 📄 许可证
 
 本项目基于 [MIT 许可证](LICENSE) 开源。欢迎 fork、提交 PR 或提出 issue！
+
+> 本仓库为上游 [oopooa/opresume](https://github.com/oopooa/opresume) 的 fork 增强版：新功能与改动见 [✨ 本 Fork 亮点](#-本-fork-亮点)，代码主体来自上游，授权保持 MIT 不变。

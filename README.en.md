@@ -156,22 +156,15 @@ src/
 
 ---
 
-## ⭐ Star History (upstream project)
+## 👥 Authors & Acknowledgments
 
-<div align="center">
-
-<a href="https://www.star-history.com/?repos=oopooa%2Fopresume&type=date&legend=top-left">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&theme=dark&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
-    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
-  </picture>
-</a>
-
-</div>
+- **Maintainer**: [TinLi-San](https://github.com/TinLi-San) — new features and maintenance of this fork (Campus Fresh Graduate template, school logo editor, more AI providers, test harness, Vercel deployment)
+- **Upstream**: [oopooa/opresume](https://github.com/oopooa/opresume) ([MIT](LICENSE)) — the foundation of this repository; thanks to the original author for open-sourcing it
 
 ---
 
 ## 📄 License
 
 This project is open-sourced under the [MIT License](LICENSE). Feel free to fork, submit PRs, or open issues!
+
+> This repository is a forked enhancement of [oopooa/opresume](https://github.com/oopooa/opresume): see [✨ Highlights of This Fork](#-highlights-of-this-fork) for what's new. The codebase originates from upstream and keeps the MIT license.
