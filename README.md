@@ -9,6 +9,7 @@
 [![Vite](https://img.shields.io/badge/Vite-5-646cff?logo=vite&logoColor=white)](https://vitejs.dev)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06b6d4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Deployment: Vercel](https://img.shields.io/badge/deployment-Vercel-black?logo=vercel&logoColor=white)](https://opresume.vercel.app)
 
 [English](./README.en.md) | 简体中文
 
@@ -17,6 +18,21 @@
 <img src="docs/images/mockup.webp" alt="OpResume 预览" width="800" />
 
 </div>
+
+> 🚀 **在线版已上线**：本项目部署于 Vercel（**[https://opresume.vercel.app](https://opresume.vercel.app)**），无需安装、无需登录，打开即用；`main` 分支每次 push 自动发布生产版本。
+
+## ✨ 本 Fork 亮点
+
+本仓库是 [oopooa/opresume](https://github.com/oopooa/opresume)（v1.5.3）的增强版 fork，**面向刚毕业的应届生**做了专项优化：
+
+- 🎓 **Fresh Canvas 应届生模板（Template 7，默认模板）**
+  - 一页 A4 紧凑排版，学术风格黑点/编号列表，栏目专属 Lucide 图标
+  - 校徽/学校 Logo **一键上传**，主题色自动从校徽主色提取
+  - 预置东华大学校徽与完整应届生示例内容；默认数据已去除专业排名等冗余项
+  - **新用户打开即默认此模板**，无需手动切换
+- 🤖 **多 AI 提供商 + 自定义端点**：DeepSeek、Qwen（通义千问）、Moonshot、MiniMax、Mimo、OpenCode、硅基流动，以及任意 OpenAI 兼容端点；BYOK 模式，密钥仅存浏览器本地
+- 🧩 **校徽编辑器**：可视化上传、调整学校 Logo
+- 🧪 **质量保障**：内置 PDF 导入测试 harness（`scripts/`）与 7 份测试夹具（`test-data/`），覆盖 PDF 文本提取、AI 结构化解析与真值比对
 
 ## ✨ 核心功能
 
@@ -44,38 +60,40 @@
 
 ---
 
-## 🚀 快速开始
+## 🚀 使用方式
 
-### 环境要求
+### 🖥️ 在线使用（推荐，无需安装）
 
-- [Node.js](https://nodejs.org) >= 18
-- npm >= 8
+直接打开 **[https://opresume.vercel.app](https://opresume.vercel.app)** 即可开始制作简历：无需注册、无需登录，数据仅保存在浏览器本地。
 
-### 安装与运行
+### 🛠️ 本地开发（可选，面向开发者/贡献者）
+
+**环境要求**：[Node.js](https://nodejs.org) ≥ 18，npm ≥ 8
 
 ```bash
-# 1. 克隆仓库
-git clone https://github.com/oopooa/opresume.git
-cd opresume
+# 1. 克隆本仓库
+git clone https://github.com/TinLi-San/opresume_campus.git
+cd opresume_campus
 
 # 2. 安装依赖
 npm install
 
-# 3. 启动开发服务器
+# 3. 启动开发服务器（Vite 默认端口 5173）
 npm run dev
 ```
 
-在浏览器中打开 `http://localhost:5173`，即可开始制作你的完美简历。
+启动后在本机浏览器访问 `http://localhost:5173`。注意：该地址是**本地开发模式**，仅供本机调试；对外使用请访问上面的在线地址。
 
-### 构建与部署
+> 同步上游：`git remote add upstream https://github.com/oopooa/opresume.git && git fetch upstream && git merge upstream/master`
+
+### 📦 构建与部署
 
 ```bash
-# 生产构建
-npm run build
-
-# 预览构建产物
-npm run preview
+npm run build     # 生产构建（tsc -b && vite build，产物输出到 dist/）
+npm run preview   # 本地预览构建产物
 ```
+
+本仓库已接入 **Vercel** 持续部署：push 到 `main` 自动构建并发布生产版（[https://opresume.vercel.app](https://opresume.vercel.app)），PR 会自动生成预览链接。
 
 ---
 
@@ -108,6 +126,7 @@ npm run preview
 - [x] AI 润色
 - [x] 应届生校园模板（校徽上传、栏目图标、一页 A4 适配）
 - [x] 多 AI 提供商支持
+- [x] 校徽编辑器
 - [ ] AI 简历评分与分析
 - [ ] 多简历管理
 - [ ] 智能一页适配
@@ -137,16 +156,16 @@ src/
 
 ---
 
-## ⭐ Star History
+## ⭐ Star History（上游项目）
 
 <div align="center">
 
 <a href="https://www.star-history.com/?repos=oopooa%2Fopresume&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&theme=dark&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
- </picture>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&theme=dark&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
+    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
+  </picture>
 </a>
 
 </div>

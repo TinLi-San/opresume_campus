@@ -9,6 +9,7 @@
 [![Vite](https://img.shields.io/badge/Vite-5-646cff?logo=vite&logoColor=white)](https://vitejs.dev)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06b6d4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Deployment: Vercel](https://img.shields.io/badge/deployment-Vercel-black?logo=vercel&logoColor=white)](https://opresume.vercel.app)
 
 [简体中文](./README.md) | English
 
@@ -17,6 +18,21 @@
 <img src="docs/images/mockup.webp" alt="OpResume Preview" width="800" />
 
 </div>
+
+> 🚀 **Live online:** Deployed on Vercel at **[https://opresume.vercel.app](https://opresume.vercel.app)** — no install, no login required. Every push to `main` automatically ships a new production build.
+
+## ✨ Highlights of This Fork
+
+This repository is an enhanced fork of [oopooa/opresume](https://github.com/oopooa/opresume) (v1.5.3), **tuned specifically for fresh graduates**:
+
+- 🎓 **Fresh Canvas campus template (Template 7, now the default)**
+  - One-page A4 compact layout, academic black-dot / numbered lists, section-specific Lucide icons
+  - **One-click school badge/logo upload**, with the theme color auto-extracted from the badge
+  - Ships with the Donghua University badge and a complete fresh-graduate sample; the default demo data no longer includes redundant fields like "academic rank"
+  - **New users land on this template by default** — no manual switching required
+- 🤖 **More AI providers + custom endpoints**: DeepSeek, Qwen, Moonshot, MiniMax, Mimo, OpenCode, SiliconFlow, plus any OpenAI-compatible endpoint; BYOK model, keys stay in your browser
+- 🧩 **School logo editor**: upload and adjust your school logo visually
+- 🧪 **Quality assurance**: built-in PDF import test harness (`scripts/`) with 7 test fixtures (`test-data/`), covering text extraction, AI-structured parsing, and truth-table scoring
 
 ## ✨ Key Features
 
@@ -44,38 +60,40 @@
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Getting Started
 
-### Prerequisites
+### 🖥️ Use it online (recommended, no install)
 
-- [Node.js](https://nodejs.org) >= 18
-- npm >= 8
+Just open **[https://opresume.vercel.app](https://opresume.vercel.app)** and start building your resume — no sign-up, no login, and your data stays in the browser.
 
-### Installation & Running
+### 🛠️ Local development (optional, for developers/contributors)
+
+**Prerequisites**: [Node.js](https://nodejs.org) >= 18, npm >= 8
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/oopooa/opresume.git
-cd opresume
+# 1. Clone this repository
+git clone https://github.com/TinLi-San/opresume_campus.git
+cd opresume_campus
 
 # 2. Install dependencies
 npm install
 
-# 3. Start the dev server
+# 3. Start the dev server (Vite default port 5173)
 npm run dev
 ```
 
-Open `http://localhost:5173` in your browser and start crafting your perfect resume.
+Open `http://localhost:5173` in your browser. Note: this is the **local dev server** for debugging only — for public access, use the online link above.
 
-### Build & Deploy
+> Sync upstream: `git remote add upstream https://github.com/oopooa/opresume.git && git fetch upstream && git merge upstream/master`
+
+### 📦 Build & Deploy
 
 ```bash
-# Build for production
-npm run build
-
-# Preview the build
-npm run preview
+npm run build     # Production build (tsc -b && vite build, output to dist/)
+npm run preview   # Preview the build locally
 ```
+
+This repository is wired to **Vercel** continuous deployment: pushing to `main` builds and ships the production release ([https://opresume.vercel.app](https://opresume.vercel.app)) automatically; pull requests get preview URLs.
 
 ---
 
@@ -108,6 +126,7 @@ npm run preview
 - [x] AI rewrite
 - [x] Campus Fresh Graduate template (school logo upload, section icons, single-page A4 fit)
 - [x] Multiple AI provider support
+- [x] School logo editor
 - [ ] AI resume scoring & analysis
 - [ ] Multiple resume management
 - [ ] Smart fit-to-page
@@ -137,17 +156,18 @@ src/
 
 ---
 
-## ⭐ Star History
+## ⭐ Star History (upstream project)
 
 <div align="center">
 
 <a href="https://www.star-history.com/?repos=oopooa%2Fopresume&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&theme=dark&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
- </picture>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&theme=dark&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
+    <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=oopooa/opresume&type=date&legend=top-left&sealed_token=qYSqFWlVjh9k8hylq4Fywx_c-yoIMsE7Tvf6vXvATjmJ6nvl3jivRMupEba9LrRm8O7CbKr9Ehk7vmjuKZd-TLPOEQr0o5cWuA3ZYzF_ZiAGp8-hdgmtC-Qn52_RDK6k5SEzADxFnRhr7YbBZcSkJEyLAFcX-xwOJipjFykfgYVmB_rhikJUYD9W0eMe" />
+  </picture>
 </a>
+
 </div>
 
 ---
