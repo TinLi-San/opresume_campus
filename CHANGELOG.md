@@ -1,6 +1,25 @@
 # 更新日志 (Changelog)
 
 
+## v1.8.0 (2026-08-28)
+
+### ✨ 新功能 (Features)
+
+* 同步上游：设置面板快捷入口升级为导航抽屉（MenuPanel），主内容区在菜单打开时锁定交互（inert）
+* AI 模型目录校准：多供应商模型列表对齐官方在售目录，精选高性价比模型（DeepSeek-V4 系列、Kimi-K3、MiniMax-M3、Qwen3 系列、OpenCode Go 精选等）
+* PDF 导入升级：保留原版式的文本提取（layout-preserving），AI 结构化解析接入「校验-修复」循环（最多自动修复 2 轮）
+* 新增 PDF 布局映射离线回归脚本（scripts/test-mapper-offline.ts）与 7 份测试夹具
+
+### 🐛 Bug 修复 (Bug Fixes)
+
+* 外观设置：校园应届生模板（Template 7）的主题色由校徽自动提取，选中该模板时明确提示全局主题色对其不生效
+* AI 供应商列表：OpenCode（Go 订阅）平台接口不允许浏览器直连，在列表中明示需自备 OpenAI 兼容 CORS 中转
+* 落地页 FAQ「支持哪些 AI 供应商」更新为实际接入的 7 家供应商 + 可添加任意 OpenAI 兼容端点（BYOK）
+* Issue 模板：使用方式选项由旧 Cloudflare Pages 地址更新为 Vercel 在线地址，讨论区链接指向本 fork
+
+### 🧪 测试 (Tests)
+
+* 新增 PDF 布局映射离线回归脚本及其测试夹具（test-data/resumes/01~07）
 
 ## v1.7.0 (2026-08-28)
 
