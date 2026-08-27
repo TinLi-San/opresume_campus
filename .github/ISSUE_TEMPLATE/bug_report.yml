@@ -54,7 +54,7 @@ body:
       label: 使用方式
       description: 你是如何运行 OpResume 的？
       options:
-        - 在线网页体验 (opresume.pages.dev)
+        - 在线网页体验 (opresume.vercel.app)
         - 本地开发 (npm run dev)
         - 本地静态部署 (npm run build)
     validations:
