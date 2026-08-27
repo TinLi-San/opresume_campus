@@ -135,7 +135,7 @@ export function Toolbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 flex h-12 items-center justify-between border-b bg-white px-3.5 print:hidden">
+      <header className="sticky top-0 z-50 flex h-[var(--app-header-height)] items-center justify-between border-b bg-white px-3.5 print:hidden">
         <div className="flex items-center gap-1 select-none">
           <button
             type="button"
