@@ -2,6 +2,14 @@
 
 
 
+## v1.7.0 (2026-08-28)
+
+### ✨ 新功能 (Features)
+
+* 完成 GitHub ↔ Vercel 双向品牌统一：仓库 About、README 链接与站内 GitHub 链接全部指向本 Fork（TinLi-San/opresume_campus）与 Vercel 在线版（https://opresume.vercel.app）
+* README 移除上游 Star History 图表，新增「作者与致谢」，明确区分 Fork 与上游的定位
+* index.html 的 canonical / OG / 结构化数据地址从旧 Cloudflare Pages 更新为 Vercel 线上地址
+
 ## v1.6.0 (2026-08-27)
 
 ### ✨ 新功能 (Features)
