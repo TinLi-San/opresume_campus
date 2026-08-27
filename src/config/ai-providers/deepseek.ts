@@ -8,12 +8,13 @@ import deepseekIcon from '@/assets/icons/deepseek.svg';
  * 模型 ID 于 2026-08 实测校准：
  * - 官方定价页（api-docs.deepseek.com/quick_start/pricing）当前仅有 deepseek-v4-* 三个模型，
  *   全部支持 JSON Output / Tool Calls / 1M 上下文；
- * - 旧别名 deepseek-chat / deepseek-reasoner 已从官方模型列表移除，调用会报模型不存在，不再收录。
+ * - 旧别名 deepseek-chat / deepseek-reasoner 已从官方模型列表移除，调用会报模型不存在，不再收录；
+ * - 官方在售即此三款，无需再收敛。
  */
 const models: AIProviderPreset['models'] = [
-  { id: 'deepseek-v4-flash', name: 'DeepSeek-V4-Flash', tags: ['chat'] },
-  { id: 'deepseek-v4-flash-vision-exp', name: 'DeepSeek-V4-Flash-Vision-Exp', tags: ['chat'] },
-  { id: 'deepseek-v4-pro', name: 'DeepSeek-V4-Pro', tags: ['chat'] },
+  { id: 'deepseek-v4-flash', name: 'DeepSeek-V4-Flash', description: '默认推荐，性价比与综合能力均衡', tags: ['chat'] },
+  { id: 'deepseek-v4-pro', name: 'DeepSeek-V4-Pro', description: '旗舰模型，复杂任务质量最高', tags: ['chat'] },
+  { id: 'deepseek-v4-flash-vision-exp', name: 'DeepSeek-V4-Flash-Vision-Exp', description: '实验版：支持图像理解输入', tags: ['chat'] },
 ];
 
 const deepseek: AIProviderPreset = {

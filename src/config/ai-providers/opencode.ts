@@ -7,8 +7,8 @@ import type { AIProviderPreset } from '@/types';
  * 模型列表：https://opencode.ai/zen/go/v1/models（实测返回 OpenAI 格式 { data: [{ id }] }）
  *
  * ✅ 2026-08 实测校准（scripts/verify-provider-endpoints.ts + 直连 /v1/models 无鉴权可读）：
- * - 官方 /v1/models 实时返回 31 个模型（含 hy3-preview），本表收录其中可用 /v1/chat/completions 的 27 个；
- * - 实测 /v1/models 无需 key 即可读取（200），与浏览器直连限制（CORS）无关；
+ * - 官方 /v1/models 实时返回 31 个模型（含 hy3-preview），本表只收录「常用 + 高性价比」
+ *   子集（覆盖各家热门主力模型），不再罗列全部 27 个可用模型；
  * - grok-4.6 / gpt-5.6-luna 走 /v1/responses（官方文档标注），不适用本应用的
  *   chat/completions 请求格式，故不列出；grok-4.5、muse-spark-1.2-contributor
  *   端点类型未确认，同样不列出。
@@ -21,33 +21,16 @@ import type { AIProviderPreset } from '@/types';
  *   本预设的 relay 字段指向可用网关）。
  */
 const models: AIProviderPreset['models'] = [
-  { id: 'minimax-m3', name: 'MiniMax-M3', tags: ['chat'] },
-  { id: 'minimax-m2.7', name: 'MiniMax-M2.7', tags: ['chat'] },
-  { id: 'minimax-m2.5', name: 'MiniMax-M2.5', tags: ['chat'] },
-  { id: 'kimi-k3', name: 'Kimi-K3', tags: ['chat'] },
-  { id: 'kimi-k2.7-code', name: 'Kimi-K2.7-Code', tags: ['code', 'chat'] },
-  { id: 'kimi-k2.6', name: 'Kimi-K2.6', tags: ['chat'] },
-  { id: 'longcat-2.0', name: 'LongCat-2.0', tags: ['chat'] },
-  { id: 'kimi-k2.5', name: 'Kimi-K2.5', tags: ['chat'] },
-  { id: 'glm-5.2', name: 'GLM-5.2', tags: ['chat'] },
-  { id: 'glm-5.3-flash', name: 'GLM-5.3-Flash', tags: ['chat'] },
-  { id: 'glm-5.3', name: 'GLM-5.3', tags: ['chat'] },
-  { id: 'glm-5.1', name: 'GLM-5.1', tags: ['chat'] },
-  { id: 'glm-5', name: 'GLM-5', tags: ['chat'] },
-  { id: 'deepseek-v4-pro', name: 'DeepSeek-V4-Pro', tags: ['chat'] },
-  { id: 'deepseek-v4-flash', name: 'DeepSeek-V4-Flash', tags: ['chat'] },
-  { id: 'deepseek-v4-flash-vision-exp', name: 'DeepSeek-V4-Flash-Vision-Exp', tags: ['chat'] },
-  { id: 'qwen3.7-max', name: 'Qwen3.7-Max', tags: ['chat'] },
-  { id: 'qwen3.8-max', name: 'Qwen3.8-Max', tags: ['chat'] },
-  { id: 'qwen3.7-plus', name: 'Qwen3.7-Plus', tags: ['chat'] },
-  { id: 'qwen3.6-plus', name: 'Qwen3.6-Plus', tags: ['chat'] },
-  { id: 'qwen3.5-plus', name: 'Qwen3.5-Plus', tags: ['chat'] },
-  { id: 'mimo-v2-pro', name: 'MiMo-V2-Pro', tags: ['chat'] },
-  { id: 'mimo-v2-omni', name: 'MiMo-V2-Omni', tags: ['chat'] },
-  { id: 'mimo-v2.5-pro', name: 'MiMo-V2.5-Pro', tags: ['chat'] },
-  { id: 'mimo-v2.5', name: 'MiMo-V2.5', tags: ['chat'] },
-  { id: 'hy3', name: 'Hy3', tags: ['chat'] },
-  { id: 'hy3-preview', name: 'Hy3-Preview', tags: ['chat'] },
+  { id: 'deepseek-v4-flash', name: 'DeepSeek-V4-Flash', description: '默认推荐，通用编程性价比之选', tags: ['chat'] },
+  { id: 'deepseek-v4-pro', name: 'DeepSeek-V4-Pro', description: '顶级编程与推理能力', tags: ['chat'] },
+  { id: 'kimi-k3', name: 'Kimi-K3', description: '长上下文通用助手', tags: ['chat'] },
+  { id: 'kimi-k2.7-code', name: 'Kimi-K2.7-Code', description: '专注代码生成的 Kimi 模型', tags: ['code', 'chat'] },
+  { id: 'glm-5.3-flash', name: 'GLM-5.3-Flash', description: '轻量快速，高频调用成本低', tags: ['chat'] },
+  { id: 'glm-5.3', name: 'GLM-5.3', description: '智谱最新旗舰，综合能力强', tags: ['chat'] },
+  { id: 'qwen3.8-max', name: 'Qwen3.8-Max', description: '阿里最新旗舰大杯', tags: ['chat'] },
+  { id: 'minimax-m3', name: 'MiniMax-M3', description: 'MiniMax 最新旗舰', tags: ['chat'] },
+  { id: 'minimax-m2.7', name: 'MiniMax-M2.7', description: 'MiniMax 均衡主力', tags: ['chat'] },
+  { id: 'mimo-v2.5-pro', name: 'MiMo-V2.5-Pro', description: '小米增强版推理', tags: ['chat'] },
 ];
 
 const opencode: AIProviderPreset = {

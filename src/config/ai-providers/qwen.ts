@@ -5,31 +5,23 @@ import qwenIcon from '@/assets/icons/qwen.svg';
  * 千问（通义千问，阿里云百炼 DashScope）
  * 官方 OpenAI 兼容接入：Base URL https://dashscope.aliyuncs.com/compatible-mode/v1
  *
- * 模型 ID 于 2026-08 实测校准：
- * - 交叉核对阿里云百炼「模型大全」页（help.aliyun.com/zh/model-studio/models）与
- *   models.dev alibaba-cn 数据集，剔除不存在的名称；
- * - 注意：qwen-flash / qwen3.x-flash 并非免费模型（按量计费），不再标注 free；
- * - qwen3.8-flash / qwen3.7-flash / qwen3.5-flash 等新名称仅以官方文档出现时收录。
+ * 模型 ID 于 2026-08 实测校准（交叉核对阿里云百炼「模型大全」页
+ * help.aliyun.com/zh/model-studio/models 与 models.dev alibaba-cn 数据集）。
+ *
+ * 本表为「常用 + 高性价比」精选列表（应用场景：简历内容生成/润色），
+ * 未罗列全部 Qwen3.x 变体；完整模型目录见官方模型大全页，
+ * 运行期还会用 /v1/models 实测结果过滤。
+ * - qwen-flash / qwen3.x-flash 并非免费模型（按量计费），不标注 free；
+ * - reasoning 类模型（qwq-plus）按需选用，速度较慢。
  */
 const models: AIProviderPreset['models'] = [
-  { id: 'qwen-plus', name: 'Qwen-Plus', tags: ['chat'] },
-  { id: 'qwen-max', name: 'Qwen-Max', tags: ['chat'] },
-  { id: 'qwen-turbo', name: 'Qwen-Turbo', tags: ['chat'] },
-  { id: 'qwen-flash', name: 'Qwen-Flash', tags: ['chat'] },
-  { id: 'qwen-long', name: 'Qwen-Long', tags: ['chat'] },
-  { id: 'qwen3-max', name: 'Qwen3-Max', tags: ['chat'] },
-  { id: 'qwen3.8-max', name: 'Qwen3.8-Max', tags: ['chat'] },
-  { id: 'qwen3.7-max', name: 'Qwen3.7-Max', tags: ['chat'] },
-  { id: 'qwen3.7-plus', name: 'Qwen3.7-Plus', tags: ['chat'] },
-  { id: 'qwen3.7-flash', name: 'Qwen3.7-Flash', tags: ['chat'] },
-  { id: 'qwen3.6-max-preview', name: 'Qwen3.6-Max-Preview', tags: ['chat'] },
-  { id: 'qwen3.6-plus', name: 'Qwen3.6-Plus', tags: ['chat'] },
-  { id: 'qwen3.6-flash', name: 'Qwen3.6-Flash', tags: ['chat'] },
-  { id: 'qwen3.5-plus', name: 'Qwen3.5-Plus', tags: ['chat'] },
-  { id: 'qwen3.5-flash', name: 'Qwen3.5-Flash', tags: ['chat'] },
-  { id: 'qwen3-coder-plus', name: 'Qwen3-Coder-Plus', tags: ['code', 'chat'] },
-  { id: 'qwen3-coder-flash', name: 'Qwen3-Coder-Flash', tags: ['code', 'chat'] },
-  { id: 'qwq-plus', name: 'QWQ-Plus（深度思考）', tags: ['reasoning'] },
+  { id: 'qwen-flash', name: 'Qwen-Flash', description: '轻量快速，成本最低，适合高频调用', tags: ['chat'] },
+  { id: 'qwen-turbo', name: 'Qwen-Turbo', description: '速度快、价格低，日常问答性价比之选', tags: ['chat'] },
+  { id: 'qwen-plus', name: 'Qwen-Plus', description: '默认推荐，综合质量与成本均衡', tags: ['chat'] },
+  { id: 'qwen-long', name: 'Qwen-Long', description: '超长上下文（10M），适合整篇长文档处理', tags: ['chat'] },
+  { id: 'qwen-max', name: 'Qwen-Max', description: '旗舰模型，复杂任务质量最高', tags: ['chat'] },
+  { id: 'qwen3-coder-plus', name: 'Qwen3-Coder-Plus', description: '代码生成与开发辅助', tags: ['code', 'chat'] },
+  { id: 'qwq-plus', name: 'QWQ-Plus（深度思考）', description: '推理增强，适合复杂逻辑分析', tags: ['reasoning'] },
 ];
 
 const qwen: AIProviderPreset = {
