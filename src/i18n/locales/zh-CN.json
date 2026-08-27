@@ -77,7 +77,8 @@
     "clearWarning": "确认清空当前简历数据？",
     "clearWarningDesc": "此操作不可撤销。",
     "clearConfirm": "确认清空",
-    "clearSuccess": "数据已清空"
+    "clearSuccess": "数据已清空",
+    "themeCampusHint": "当前为校园应届生模板，主题色由校徽自动提取，此处全局主题色对其不生效（切换为其它模板后生效）"
   },
   "module": {
     "profile": "基本信息",
@@ -298,7 +299,8 @@
     "relayHint": "该平台不允许浏览器直连，将自动经中转代理（Vercel AI Gateway）转发；上方地址为上游供应商地址，可按需修改",
     "apiUrlHint": "Base URL，无需带 /v1（如 https://api.deepseek.com）；粘贴的 /v1 结尾地址会自动去除",
     "verifyCorsError": "无法连接该平台 API：可能是浏览器跨域（CORS）限制或网络问题。建议改用「自定义供应商」填入支持浏览器直连的中转地址，或检查网络/代理设置",
-    "savedUnverified": "配置已保存，但未通过连通性检测；AI 功能将在首次使用时再次尝试连接"
+    "savedUnverified": "配置已保存，但未通过连通性检测；AI 功能将在首次使用时再次尝试连接",
+    "requiresRelayNote": "该平台接口不允许浏览器直连，需自备 OpenAI 兼容 CORS 中转（可用「自定义供应商」填入中转地址）"
   },
   "importPDF": {
     "title": "AI 智能解析 PDF 简历",

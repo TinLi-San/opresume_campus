@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Palette, Check, ArrowRightLeft, Minus, Plus } from 'lucide-react';
+import { Palette, Check, ArrowRightLeft, Minus, Plus, Info } from 'lucide-react';
 import { LayoutGroup, motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/store/ui';
@@ -31,6 +31,7 @@ import {
   TooltipContent,
 } from '@/components/ui/tooltip';
 import { templateIds, definitions } from '@/components/Resume/templates';
+import { CAMPUS_TEMPLATE_ID } from '@/components/Resume/modules/CampusModules';
 import { ResumeView } from '@/components/Resume';
 import type { SpacingPreset } from '@/types';
 
@@ -279,6 +280,13 @@ export function AppearanceDrawer() {
                     );
                   })}
                 </div>
+                {/* 校园应届生模板：主题色由校徽自动提取，全局主题色在该模板上不生效 */}
+                {template === CAMPUS_TEMPLATE_ID && (
+                  <p className="mt-2.5 flex items-start gap-1.5 rounded-lg bg-amber-50 px-2.5 py-2 text-xs leading-relaxed text-amber-700">
+                    <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                    <span>{t('toolbar.themeCampusHint')}</span>
+                  </p>
+                )}
               </section>
 
               {/* 图标显示 */}

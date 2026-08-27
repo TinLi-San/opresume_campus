@@ -49,12 +49,17 @@ export function ProviderCard({ providerId, onClick }: ProviderCardProps) {
             </div>
           )}
         </div>
-        <div className="flex min-w-0 items-center gap-1.5">
-          <span className="truncate text-sm font-medium">{name}</span>
-          {preset.custom && (
-            <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-              {t('settings.customProviderTag')}
-            </span>
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <div className="flex min-w-0 items-center gap-1.5">
+            <span className="truncate text-sm font-medium">{name}</span>
+            {preset.custom && (
+              <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                {t('settings.customProviderTag')}
+              </span>
+            )}
+          </div>
+          {preset.id === 'opencode' && (
+            <span className="text-[10px] leading-tight text-amber-600">{t('settings.requiresRelayNote')}</span>
           )}
         </div>
       </div>
