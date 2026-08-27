@@ -20,7 +20,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:title" content="优派简历 — 写简历，本应如此。" />
   <meta property="og:description" content="免登录的智能简历生成器。AI 润色、拖拽排版、隐私打码 — 您的简历，永远只在您手里。" />
-  <meta property="og:url" content="https://opresume.pages.dev" />
+  <meta property="og:url" content="https://opresume.vercel.app" />
   <meta property="og:image" content="/favicon.svg" />
   <meta property="og:locale" content="zh_CN" />
   <meta property="og:site_name" content="优派简历" />
@@ -38,7 +38,7 @@
   <meta name="keywords" content="简历生成器,在线简历,免登录简历,本地简历,React 简历,AI 简历,隐私简历,PDF 简历,resume builder,opresume,优派简历" />
   <meta name="author" content="OpResume" />
   <meta name="robots" content="index,follow" />
-  <link rel="canonical" href="https://opresume.pages.dev" />
+  <link rel="canonical" href="https://opresume.vercel.app" />
 
   <!-- 结构化数据：让搜索引擎理解这是一个免费的简历生成 Web 应用 -->
   <script type="application/ld+json">
@@ -47,7 +47,7 @@
     "@type": "WebApplication",
     "name": "优派简历 OpResume",
     "alternateName": ["优派简历", "OpResume"],
-    "url": "https://opresume.pages.dev",
+    "url": "https://opresume.vercel.app",
     "applicationCategory": "BusinessApplication",
     "applicationSubCategory": "ResumeBuilder",
     "operatingSystem": "Any",
@@ -68,12 +68,12 @@
       "ATS 友好原生 PDF 导出"
     ],
     "inLanguage": ["zh-CN", "en"],
-    "softwareVersion": "1.3.0",
+    "softwareVersion": "1.7.0",
     "license": "https://opensource.org/licenses/MIT",
     "author": {
       "@type": "Organization",
       "name": "OpResume",
-      "url": "https://github.com/oopooa/opresume"
+      "url": "https://github.com/TinLi-San/opresume_campus"
     }
   }
   </script>
@@ -736,7 +736,7 @@
       </a>
       <div class="nav-actions">
         <a class="github-star-btn"
-           href="https://github.com/oopooa/opresume"
+           href="https://github.com/TinLi-San/opresume_campus"
            target="_blank" rel="noopener"
            aria-label="Star OpResume on GitHub">
           <!-- 五角星 outline；hover 时由 CSS 控制 fill 与 rotate -->
@@ -1047,7 +1047,7 @@
           return;
         }
       } catch {}
-      fetch('https://api.github.com/repos/oopooa/opresume')
+      fetch('https://api.github.com/repos/TinLi-San/opresume_campus')
         .then((r) => r.ok ? r.json() : null)
         .then((data) => {
           if (!data) return;
