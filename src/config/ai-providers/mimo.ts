@@ -3,7 +3,7 @@ import type { AIProviderPreset } from '@/types';
 /**
  * 小米 MiMo（Xiaomi MiMo 官方模型平台）
  * 官方 OpenAI 兼容接入：Base URL https://api.xiaomimimo.com/v1
- * 模型 ID 参考 models.dev（Xiaomi 官方模型列表）
+ * 模型 ID 于 2026-08 实测校准（models.dev xiaomi 目录与平台一致），端点探测 401=鉴权正常。
  */
 const models: AIProviderPreset['models'] = [
   { id: 'mimo-v2.5', name: 'MiMo-V2.5', tags: ['chat'] },

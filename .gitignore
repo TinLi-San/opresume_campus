@@ -26,3 +26,4 @@ test-data/backups/
 
 # API Key 文件（严禁入库）
 *.keys.env
+.vercel

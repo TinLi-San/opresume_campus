@@ -6,8 +6,9 @@ import type { AIProviderPreset } from '@/types';
  * API 端点：https://opencode.ai/zen/go/v1/chat/completions（OpenAI 兼容，实测 401= 需鉴权）
  * 模型列表：https://opencode.ai/zen/go/v1/models（实测返回 OpenAI 格式 { data: [{ id }] }）
  *
- * ✅ 2026-08 实测校准（scripts/verify-provider-endpoints.ts）：
- * - 官方 /v1/models 返回 31 个模型；本表仅收录 /v1/chat/completions 可用模型。
+ * ✅ 2026-08 实测校准（scripts/verify-provider-endpoints.ts + 直连 /v1/models 无鉴权可读）：
+ * - 官方 /v1/models 实时返回 31 个模型（含 hy3-preview），本表收录其中可用 /v1/chat/completions 的 27 个；
+ * - 实测 /v1/models 无需 key 即可读取（200），与浏览器直连限制（CORS）无关；
  * - grok-4.6 / gpt-5.6-luna 走 /v1/responses（官方文档标注），不适用本应用的
  *   chat/completions 请求格式，故不列出；grok-4.5、muse-spark-1.2-contributor
  *   端点类型未确认，同样不列出。

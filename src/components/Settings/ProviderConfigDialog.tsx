@@ -121,7 +121,12 @@ export function ProviderConfigDialog({
       // 自定义供应商：直接展示 API 返回的可用模型（可能超出创建时填的单个模型）
       return [...availableIds].sort().map((id) => ({ id, name: id } as AIModel));
     }
-    return preset.models.filter((m) => availableIds.has(m.id));
+    // 静态预设 ∩ 已验证模型：优先展示交集（保留预设的友好名称/标签）
+    const matched = preset.models.filter((m) => availableIds.has(m.id));
+    if (matched.length > 0) return matched;
+    // 无交集（预设过期、API 返回了新模型等）：退化为直接展示 API 返回的
+    // 模型 ID，避免“验证后模型列表为空、无法选择”的问题。
+    return [...availableIds].sort().map((id) => ({ id, name: id } as AIModel));
   }, [preset, availableIds]);
 
   const groupedModels = useMemo(() => groupModels(displayModels), [displayModels]);
