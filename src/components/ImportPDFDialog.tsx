@@ -24,7 +24,8 @@ import { getProviderPreset } from '@/config/ai-providers';
 import { extractTextFromPDF } from '@/services/pdf-parser';
 import { generateText, extractJSON } from '@/services/ai-generate';
 import { mapAIJsonToResume, isValidAIResumeData } from '@/services/resume-mapper';
-import { SYSTEM_PROMPT, buildUserPrompt } from '@/utils/pdf-prompts';
+import { validateAIResumeJson } from '@/services/resume-validate';
+import { SYSTEM_PROMPT, buildUserPrompt, buildRepairPrompt } from '@/utils/pdf-prompts';
 import type { JsonResume } from '@/types/json-resume';
 import {
   Dialog,
@@ -158,36 +159,76 @@ export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
     lastFileRef.current = file;
 
     try {
-      // 阶段 1：提取 PDF 文本
-      // 使用最小显示时间，避免步骤一闪而过影响用户感知
+      // 阶段 1：提取 PDF 文本（按行保留段落/标题结构）
       setState({ step: 'extracting' });
-      const minDisplayDelay = new Promise((r) => setTimeout(r, 2100));
+      // 最小展示时长仅用于避免进度步骤一闪而过；从 2.1s 降到 0.6s，
+      // 消除无谓等待（老版本“识别时间久”的一部分来自这段人工延迟）
+      const minDisplayDelay = new Promise((r) => setTimeout(r, 600));
       const [pdfText] = await Promise.all([extractTextFromPDF(file), minDisplayDelay]);
       if (isStale()) return;
 
-      // 阶段 2：调用 AI 解析
+      // 阶段 2：调用 AI 解析（JSON 模式 + 结构校验-修复循环）
       setState({ step: 'calling-ai' });
-      const aiResponse = await generateText(
-        {
-          apiKey: providerConfig.apiKey,
-          apiUrl: providerConfig.apiUrl,
-          model: providerConfig.selectedModel,
-          relay: preset.relay,
-        },
-        [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: buildUserPrompt(pdfText) },
-        ],
-      );
+      const aiConfig = {
+        apiKey: providerConfig.apiKey,
+        apiUrl: providerConfig.apiUrl,
+        model: providerConfig.selectedModel,
+        relay: preset.relay,
+      };
+      // 首轮消息：系统提示 + 简历文本
+      const baseMessages = (): Array<{ role: 'system' | 'user'; content: string }> => [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: buildUserPrompt(pdfText) },
+      ];
+
+      // 2a. 首次调用：response_format=json_object 约束结构化输出
+      let aiResponse = await generateText(aiConfig, baseMessages(), undefined, 4096, undefined, true);
       if (isStale()) return;
 
-      // 阶段 3：解析和映射数据（瞬时完成，不单独展示步骤）
-      const aiJson = extractJSON(aiResponse);
+      // 2b. 解析 + 结构校验；不通过则带着上一次输出与问题清单发起修复（最多 2 轮）
+      let aiJson: unknown = null;
+      let parseError: string | null = null;
+      try {
+        aiJson = extractJSON(aiResponse);
+      } catch (error) {
+        parseError = error instanceof Error ? error.message : String(error);
+      }
+      let issues = aiJson ? validateAIResumeJson(aiJson).issues : ['无法解析为 JSON 对象'];
+      let repairRound = 0;
+      while ((!aiJson || issues.length > 0 || !isValidAIResumeData(aiJson)) && repairRound < 2) {
+        repairRound += 1;
+        if (isStale()) return;
+        // 带上模型上次的输出 + 具体问题清单，要求只返回修正后的 JSON
+        aiResponse = await generateText(
+          aiConfig,
+          [
+            ...baseMessages(),
+            { role: 'assistant', content: aiResponse },
+            { role: 'user', content: buildRepairPrompt(issues) },
+          ],
+          undefined,
+          4096,
+          undefined,
+          true,
+        );
+        try {
+          aiJson = extractJSON(aiResponse);
+          parseError = null;
+        } catch (error) {
+          aiJson = null;
+          parseError = error instanceof Error ? error.message : String(error);
+        }
+        issues = aiJson ? validateAIResumeJson(aiJson).issues : ['无法解析为 JSON 对象'];
+      }
+      if (isStale()) return;
 
-      if (!isValidAIResumeData(aiJson)) {
+      // 2c. 修复后仍未通过 → 报错（保留原始错误信息便于排查）
+      if (!aiJson || !isValidAIResumeData(aiJson)) {
+        if (parseError) throw new Error(parseError);
         throw new Error(t('importPDF.errorInvalidAIData'));
       }
 
+      // 阶段 3：映射数据（瞬时完成，不单独展示步骤）
       const resume = mapAIJsonToResume(aiJson);
 
       // 进入预览阶段

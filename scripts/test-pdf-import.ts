@@ -31,6 +31,8 @@ import path from 'node:path';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { SYSTEM_PROMPT, buildUserPrompt } from '../src/utils/pdf-prompts.ts';
 import { isValidAIResumeData, mapAIJsonToResume } from '../src/services/resume-mapper.ts';
+import { validateAIResumeJson } from '../src/services/resume-validate.ts';
+import { pageItemsToText, normalizeText, capTextForAI } from '../src/utils/pdf-text.ts';
 import opencodePreset from '../src/config/ai-providers/opencode.ts';
 
 const RESUME_DIR = path.resolve(import.meta.dirname, '../test-data/resumes');
@@ -88,7 +90,7 @@ function normalizeApiBaseUrl(raw: string): string {
   return url;
 }
 
-/** PDF 文本提取：与 pdf-parser.ts#extractTextFromPDF 一致 */
+/** PDF 文本提取：与 pdf-parser.ts#extractTextFromPDF 一致（共用 utils/pdf-text.ts 纯函数） */
 async function extractText(filePath: string): Promise<{ text: string; chars: number; ms: number }> {
   const t0 = Date.now();
   const data = new Uint8Array(fs.readFileSync(filePath));
@@ -97,14 +99,10 @@ async function extractText(filePath: string): Promise<{ text: string; chars: num
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i);
     const content = await page.getTextContent();
-    parts.push(
-      content.items
-        .filter((item) => 'str' in item)
-        .map((item) => (item as { str: string }).str)
-        .join(' '),
-    );
+    // 按视觉行重建文本（保留段落/标题/条目边界）
+    parts.push(pageItemsToText(content.items));
   }
-  const text = parts.join('\n\n');
+  const text = capTextForAI(normalizeText(parts.join('\n\n')));
   const trimmed = text.trim();
   if (!trimmed || trimmed.length < MIN_TEXT_CHARS) {
     throw new Error(`insufficient text: ${trimmed.length} chars < ${MIN_TEXT_CHARS}`);
@@ -395,6 +393,10 @@ async function main(): Promise<void> {
         base.aiOk = true;
 
         const aiJson = extractJSON(ai.text);
+        const v = validateAIResumeJson(aiJson);
+        if (!v.ok) {
+          console.log(`  [warn] ${pdf} x ${provider.id} validation issues: ${v.issues.join('; ')}`);
+        }
         if (!isValidAIResumeData(aiJson)) {
           base.extractError = 'AI data invalid (missing basics/work/education/projects/skills)';
           console.log(`[FAIL] ${pdf} x ${provider.id} invalid AI data`);

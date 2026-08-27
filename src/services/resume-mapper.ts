@@ -3,6 +3,12 @@
  *
  * 采用宽松映射策略：缺失字段使用默认值，格式错误尝试修复，
  * 确保即使 AI 返回不完美的数据也能正常工作。
+ *
+ * 2026-08 增强：
+ * - 日期解析支持区间（2021.03-2024.01 / 2021年3月至今 / 2021 - 2024）、
+ *   中文年月（2021年3月）与英文月份（Sep 2021）；
+ * - 技能支持“纯标签罗列”回退（不再因为缺熟练度整段丢弃）；
+ * - 补充 url / courses / summary 等字段透传。
  */
 
 import type { JsonResume } from '@/types/json-resume';
@@ -77,28 +83,104 @@ function generateId(): string {
   return crypto.randomUUID();
 }
 
+/* ---------------- 日期解析 ---------------- */
+
+const MONTHS_EN: Record<string, number> = {
+  jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+  jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
+};
+
+/**
+ * 解析单个日期 token，返回 YYYY-MM；无法解析返回 ''。
+ * 支持：2021-03 / 2021.3 / 2021/03 / 2021年3月 / 2021年 / 2021 / Sep 2021 / 2021 Sep
+ */
+function parseDateToken(raw: string): string {
+  const s = raw.trim().toLowerCase();
+  if (!s) return '';
+  if (s === 'present' || s === '至今' || s === '现在') return 'present';
+
+  // 中文年月：2021年3月 / 2021年
+  const cn = s.match(/^(\d{4})年(\d{1,2})月?$/);
+  if (cn) return `${cn[1]}-${cn[2].padStart(2, '0')}`;
+  const cnYear = s.match(/^(\d{4})年$/);
+  if (cnYear) return `${cnYear[1]}-01`;
+
+  // 分隔符年月：2021-03 / 2021.3 / 2021/03 / 2021.03
+  const ymd = s.match(/^(\d{4})[.\-/](\d{1,2})$/);
+  if (ymd) return `${ymd[1]}-${ymd[2].padStart(2, '0')}`;
+
+  // 英文月份：Sep 2021 / September 2021 / 2021-Sep
+  const en = s.match(/^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*[.\- ]+(\d{4})$/i);
+  if (en) return `${en[2]}-${String(MONTHS_EN[en[1]]).padStart(2, '0')}`;
+  const en2 = s.match(/^(\d{4})[.\- ]+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*$/i);
+  if (en2) return `${en2[1]}-${String(MONTHS_EN[en2[2]]).padStart(2, '0')}`;
+
+  // 纯年份：2021
+  const year = s.match(/^(\d{4})$/);
+  if (year) return `${year[1]}-01`;
+
+  return '';
+}
+
+/** 是否“present 类”值 */
+function isPresentLike(s: string): boolean {
+  const v = s.trim().toLowerCase();
+  return v === 'present' || v === '至今' || v === '现在' || v === '至今';
+}
+
+/**
+ * 拆分日期区间字符串（如 "2021.03-2024.01"、"2021年3月至今"、"2021 - 2024"）。
+ * 只有两边都能被识别为日期（含 present）时才返回区间，否则原样返回。
+ */
+function splitDateRange(raw: string): { start: string; end: string } {
+  const s = raw.trim();
+  if (!s) return { start: '', end: '' };
+  // 以“至今/到现在/迄今”结尾 → 区间到 present（含 "2021.03~至今" 这类写法）
+  const toPresent = s.match(/^(.*?)(?:至今|到现在|迄今)$/);
+  if (toPresent) {
+    const startTok = toPresent[1].trim().replace(/[~〜至到\-—–\s]+$/, '');
+    return { start: startTok, end: 'present' };
+  }
+  // 分隔符：~〜至到 — – － 或 “-（后随4位年份）”
+  const parts = s.split(/[~〜至到]|—|–|－|\s+-\s+|-(?=\d{4})/);
+  if (parts.length < 2) return { start: s, end: '' };
+  const startTok = parts[0].trim();
+  const endTok = parts.slice(1).join('').trim();
+  if ((parseDateToken(startTok) || isPresentLike(startTok)) && (parseDateToken(endTok) || isPresentLike(endTok))) {
+    return { start: startTok, end: endTok };
+  }
+  return { start: s, end: '' };
+}
+
+/** 统一格式化单侧日期（无区间时返回 ''） */
 function formatDate(date?: unknown): string {
   if (!date || typeof date !== 'string') return '';
-  const d = date.trim();
-  if (!d) return '';
-
-  // 处理"至今"/"present"
-  if (d === '至今' || d.toLowerCase() === 'present' || d === '现在') return 'present';
-
-  // 尝试匹配 YYYY-MM 格式
-  const yyyyMmMatch = d.match(/^(\d{4})[年.\-/](\d{1,2})/);
-  if (yyyyMmMatch) {
-    return `${yyyyMmMatch[1]}-${yyyyMmMatch[2].padStart(2, '0')}`;
+  const v = date.trim();
+  if (!v) return '';
+  if (isPresentLike(v)) return 'present';
+  const parsed = parseDateToken(v);
+  // 区间串（如 2021.03-2024.01）取第一部分；无法解析返回空串，避免脏数据入库
+  if (!parsed) {
+    const range = splitDateRange(v);
+    if (range.end) return parseDateToken(range.start) || '';
+    return '';
   }
-
-  // 尝试匹配纯年份
-  const yearMatch = d.match(/^(\d{4})/);
-  if (yearMatch) {
-    return `${yearMatch[1]}-01`;
-  }
-
-  return d;
+  return parsed;
 }
+
+/** 计算条目的起止时间（endDate 缺失时从 startDate 区间中取） */
+function resolveDates(
+  item: Record<string, unknown>,
+): { startDate: string; endDate: string } {
+  const startToken = asString(item.startDate);
+  const endToken = asString(item.endDate);
+  const range = splitDateRange(startToken);
+  const start = formatDate(range.start || startToken);
+  const end = formatDate(endToken || (range.end || ''));
+  return { startDate: start, endDate: end };
+}
+
+/* ---------------- 通用取值 ---------------- */
 
 function asString(val: unknown): string {
   if (typeof val === 'string') return val.trim();
@@ -129,7 +211,7 @@ function toListHtml(val: unknown): string | undefined {
   if (Array.isArray(val)) {
     const items = val.filter((v): v is string => typeof v === 'string' && v.trim() !== '');
     if (items.length === 0) return undefined;
-    const lis = items.map((item) => `<li><p>${item}</p></li>`).join('');
+    const lis = items.map((item) => `<li><p>${escapeHtml(item)}</p></li>`).join('');
     return `<ul>${lis}</ul>`;
   }
 
@@ -138,14 +220,24 @@ function toListHtml(val: unknown): string | undefined {
     const lines = val.split(/\n+/).map((l) => l.trim()).filter(Boolean);
     if (lines.length <= 1) {
       // 单行直接返回段落
-      return lines[0] ? `<p>${lines[0]}</p>` : undefined;
+      return lines[0] ? `<p>${escapeHtml(lines[0])}</p>` : undefined;
     }
-    const lis = lines.map((line) => `<li><p>${line}</p></li>`).join('');
+    const lis = lines.map((line) => `<li><p>${escapeHtml(line)}</p></li>`).join('');
     return `<ul>${lis}</ul>`;
   }
 
   return undefined;
 }
+
+/** 转义 HTML 特殊字符，防止简历原文中的 < > & 破坏富文本结构 */
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+/* ---------------- 各 section 提取 ---------------- */
 
 function extractBasics(raw: unknown): NonNullable<JsonResume['basics']> {
   if (!raw || typeof raw !== 'object') {
@@ -186,13 +278,15 @@ function extractWorkList(raw: unknown): JsonResume['work'] & object[] {
     })
     .map((item) => {
       const summary = asString(item.summary) || asString(item.description) || asString(item.content);
+      const dates = resolveDates(item);
       return {
         name: asString(item.name) || asString(item.company) || asString(item.companyName),
         position: asString(item.position) || asString(item.title) || asString(item.role),
-        startDate: formatDate(item.startDate),
-        endDate: formatDate(item.endDate),
+        startDate: dates.startDate,
+        endDate: dates.endDate,
         summary,
         highlights: asStringArray(item.highlights),
+        url: asString(item.url) || undefined,
         'x-op-id': generateId(),
         'x-op-departmentName': asString(item.department) || asString(item.departmentName) || undefined,
         'x-op-workDescHtml': toListHtml(item.summary) || toListHtml(item.description) || toListHtml(item.content),
@@ -209,15 +303,19 @@ function extractEducationList(raw: unknown): JsonResume['education'] & object[] 
       const institution = asString(item.institution) || asString(item.school);
       return !!institution;
     })
-    .map((item) => ({
-      institution: asString(item.institution) || asString(item.school),
-      area: asString(item.area) || asString(item.major) || asString(item.field),
-      studyType: asString(item.studyType) || asString(item.degree),
-      startDate: formatDate(item.startDate),
-      endDate: formatDate(item.endDate),
-      score: asString(item.score) || asString(item.gpa) || undefined,
-      'x-op-id': generateId(),
-    }));
+    .map((item) => {
+      const dates = resolveDates(item);
+      return {
+        institution: asString(item.institution) || asString(item.school),
+        area: asString(item.area) || asString(item.major) || asString(item.field),
+        studyType: asString(item.studyType) || asString(item.degree),
+        startDate: dates.startDate,
+        endDate: dates.endDate,
+        score: asString(item.score) || asString(item.gpa) || undefined,
+        courses: asStringArray(item.courses),
+        'x-op-id': generateId(),
+      };
+    });
 }
 
 function extractProjectList(raw: unknown): JsonResume['projects'] & object[] {
@@ -232,18 +330,29 @@ function extractProjectList(raw: unknown): JsonResume['projects'] & object[] {
     .map((item) => {
       // description = 简短项目描述，content = 详细项目内容，两者分开映射
       const description = asString(item.description);
+      const dates = resolveDates(item);
       return {
         name: asString(item.name) || asString(item.projectName),
         description: description || undefined,
         highlights: asStringArray(item.highlights),
+        keywords: asStringArray(item.keywords),
         roles: asStringArray(item.roles) || (asString(item.role) ? [asString(item.role)] : undefined),
-        startDate: formatDate(item.startDate),
-        endDate: formatDate(item.endDate),
+        startDate: dates.startDate,
+        endDate: dates.endDate,
+        url: asString(item.url) || undefined,
         'x-op-id': generateId(),
         'x-op-type': 'project' as const,
         'x-op-projectContentHtml': toListHtml(item.content) || toListHtml(item.details),
       };
     });
+}
+
+/** 判断名称是否像“技能标签”（简短、无句子标点） */
+function looksLikeSkillTag(name: string): boolean {
+  const n = name.trim();
+  if (!n || n.length > 16) return false;
+  if (/[。！？；：，、\n]/.test(n)) return false;
+  return true;
 }
 
 function extractSkillList(raw: unknown): JsonResume['skills'] & object[] {
@@ -265,7 +374,22 @@ function extractSkillList(raw: unknown): JsonResume['skills'] & object[] {
     return isValidSkillLevel(level);
   });
 
-  if (validItems.length === 0) return [];
+  if (validItems.length === 0) {
+    // 纯标签罗列回退（如 "Java、Python、SQL"）：全部没有 level 时，
+    // 保留简短无标点的标签为技能项，避免“整段技能丢失”。
+    const tagItems = items.filter((item) => looksLikeSkillTag(asString(item.name) || asString(item.skillName)));
+    if (tagItems.length === 0) return [];
+    return tagItems.map((item) => {
+      const name = asString(item.name) || asString(item.skillName);
+      return {
+        name,
+        level: '熟练',
+        keywords: asStringArray(item.keywords),
+        'x-op-id': generateId(),
+        'x-op-skillLevel': 50,
+      };
+    });
+  }
 
   return validItems.map((item) => {
     const level = asString(item.level);
@@ -291,8 +415,9 @@ function extractAwardList(raw: unknown): JsonResume['awards'] & object[] {
     })
     .map((item) => ({
       title: asString(item.title) || asString(item.name) || asString(item.awardInfo),
-      date: formatDate(item.date) || asString(item.awardTime) || undefined,
+      date: formatDate(item.date) || formatDate(item.awardTime) || undefined,
       awarder: asString(item.awarder) || asString(item.issuer) || undefined,
+      summary: asString(item.summary) || undefined,
       'x-op-id': generateId(),
     }));
 }

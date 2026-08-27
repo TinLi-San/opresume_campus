@@ -42,6 +42,11 @@ export function resolveTarget(
  * 调用 AI 生成文本
  * @param config AI 配置（apiKey、apiUrl、model）
  * @param messages 对话消息列表
+ * @param signal 中止信号（可选）
+ * @param maxTokens 最大输出 token 数（可选）
+ * @param extraBody 额外请求体字段（可选）
+ * @param jsonMode 是否启用 response_format json_object（可选）：
+ *   部分早期模型/网关不支持该字段（返回 400）时会自动去掉重试一次。
  * @returns AI 生成的文本
  * @throws 如果 API 调用失败
  */
@@ -51,11 +56,13 @@ export async function generateText(
   signal?: AbortSignal,
   maxTokens?: number,
   extraBody?: Record<string, unknown>,
+  jsonMode = false,
 ): Promise<string> {
   const target = resolveTarget(config, '/v1/chat/completions');
 
-  try {
-    const response = await fetch(target.url, {
+  /** 执行一次请求，返回 Response（不抛错）；调用方统一处理错误映射 */
+  const doCall = async (withJsonMode: boolean): Promise<Response> => {
+    return fetch(target.url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -68,28 +75,24 @@ export async function generateText(
         messages,
         temperature: 0.3,
         ...(maxTokens !== undefined && { max_tokens: maxTokens }),
+        ...(withJsonMode ? { response_format: { type: 'json_object' } } : {}),
         ...extraBody,
       }),
       signal,
     });
+  };
 
-    if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error(i18n.t('importPDF.errorInvalidApiKey'));
+  let response: Response;
+  try {
+    response = await doCall(jsonMode);
+    // 中文 API（如 DeepSeek）报错格式可能包含 response_format 不支持提示：
+    // 降级为不带 json_mode 的重试，保证模型总能回答
+    if (jsonMode && response.status === 400) {
+      const bodyText = await response.text();
+      if (/response_format|json_object|json mode|JSON Mode/i.test(bodyText)) {
+        response = await doCall(false);
       }
-      if (response.status === 429) {
-        throw new Error(i18n.t('importPDF.errorRateLimit'));
-      }
-      throw new Error(i18n.t('importPDF.errorApiFailed', { status: response.status }));
     }
-
-    const data = await response.json();
-
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      throw new Error(i18n.t('importPDF.errorInvalidAIResponse'));
-    }
-
-    return data.choices[0].message.content;
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') throw error;
     if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
@@ -97,6 +100,24 @@ export async function generateText(
     }
     throw error;
   }
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error(i18n.t('importPDF.errorInvalidApiKey'));
+    }
+    if (response.status === 429) {
+      throw new Error(i18n.t('importPDF.errorRateLimit'));
+    }
+    throw new Error(i18n.t('importPDF.errorApiFailed', { status: response.status }));
+  }
+
+  const data = await response.json();
+
+  if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+    throw new Error(i18n.t('importPDF.errorInvalidAIResponse'));
+  }
+
+  return data.choices[0].message.content;
 }
 
 /**
