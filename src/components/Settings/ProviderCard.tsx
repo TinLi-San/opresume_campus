@@ -58,9 +58,6 @@ export function ProviderCard({ providerId, onClick }: ProviderCardProps) {
               </span>
             )}
           </div>
-          {preset.id === 'opencode' && (
-            <span className="text-[10px] leading-tight text-amber-600">{t('settings.requiresRelayNote')}</span>
-          )}
         </div>
       </div>
 

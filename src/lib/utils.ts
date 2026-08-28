@@ -15,7 +15,8 @@ export function cn(...inputs: ClassValue[]) {
 export function normalizeApiBaseUrl(raw: string): string {
   let url = raw.trim();
   if (!url) return url;
-  if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
+  // 相对路径（如 /api/opencode 同源代理）保持原样，其余补 https://
+  if (!/^https?:\/\//i.test(url) && !url.startsWith('/')) url = `https://${url}`;
   url = url.replace(/\/+$/, '');
   url = url.replace(/\/chat\/completions$/i, '');
   url = url.replace(/\/v1$/i, '');

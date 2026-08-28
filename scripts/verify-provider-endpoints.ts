@@ -16,6 +16,10 @@
  *
  * 说明：base URL / modelsEndpoint / relay 配置以正则方式直接从 ai-providers/*.ts
  * 读取，与预设文件内容保持同步，避免手抄漂移。
+ *
+ * opencode 预设的 defaultApiUrl 是相对路径（/api/opencode，经仓库内置同源代理
+ * 转发到 https://opencode.ai/zen/go/*）：脚本会以 PROXY_ORIGIN（默认
+ * https://opresume.vercel.app）拼接后探测「部署后的代理链路」，验证 rewrite 生效。
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -69,7 +73,10 @@ async function probe(): Promise<void> {
 
   for (const id of PROVIDER_IDS) {
     const cfg = readProviderConfig(id);
-    const base = normalizeApiBaseUrl(cfg.baseUrl);
+    // opencode 等走同源代理的预设：defaultApiUrl 是相对路径，探测时拼接到部署域名
+    const isProxyPath = cfg.baseUrl.startsWith('/');
+    const base = isProxyPath ? cfg.baseUrl : normalizeApiBaseUrl(cfg.baseUrl);
+    const origin = isProxyPath ? (process.env.PROXY_ORIGIN?.trim() || 'https://opresume.vercel.app') : '';
     const envKey = `PROVIDER_KEY_${id.toUpperCase()}`;
     const realKey = process.env[envKey]?.trim() ?? '';
     const bearer = realKey || 'probe-invalid-key';
@@ -103,7 +110,7 @@ async function probe(): Promise<void> {
         });
       } else {
         const endpoint = cfg.modelsEndpoint ?? '/v1/models';
-        const url = `${base}${endpoint}`;
+        const url = isProxyPath ? `${origin}${base}${endpoint}` : `${base}${endpoint}`;
         const res = await fetch(url, {
           headers: { Authorization: `Bearer ${bearer}` },
           signal: AbortSignal.timeout(20000),
@@ -118,7 +125,7 @@ async function probe(): Promise<void> {
       const msg = e instanceof Error ? e.message : String(e);
       results.push({
         id, kind: cfg.relay ? 'relay-chat' : 'models', status: 'ERR', ms: Date.now() - t0,
-        url: cfg.relay ? `${cfg.relay.baseUrl}/v1/chat/completions` : `${base}${cfg.modelsEndpoint ?? '/v1/models'}`,
+        url: cfg.relay ? `${cfg.relay.baseUrl}/v1/chat/completions` : (isProxyPath ? `${origin}${base}${cfg.modelsEndpoint ?? '/v1/models'}` : `${base}${cfg.modelsEndpoint ?? '/v1/models'}`),
         snippet: msg.slice(0, 160),
       });
     }

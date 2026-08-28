@@ -44,6 +44,9 @@
     "unsaved": "Unsaved changes",
     "editResume": "Edit Resume",
     "sidebar": "Sidebar",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "zoomReset": "Reset to 100%",
     "mainArea": "Main",
     "dropHint": "Drop modules here",
     "showIcons": "Show Icons",
@@ -299,8 +302,7 @@
     "relayHint": "This provider does not allow direct browser access; requests are relayed via the AI Gateway. The address above is the upstream provider URL.",
     "apiUrlHint": "Base URL, no /v1 suffix needed (e.g. https://api.deepseek.com); a trailing /v1 is stripped automatically",
     "verifyCorsError": "Cannot reach this provider's API: likely a browser CORS restriction or network issue. Use a Custom Provider with a CORS-friendly relay URL, or check your network/proxy settings.",
-    "savedUnverified": "Provider saved, but the connectivity test did not pass. AI features will retry the connection on first use.",
-    "requiresRelayNote": "This provider cannot be called directly from a browser (no CORS headers). Add an OpenAI-compatible CORS relay via Custom Provider to use it."
+    "savedUnverified": "Provider saved, but the connectivity test did not pass. AI features will retry the connection on first use."
   },
   "importPDF": {
     "title": "AI Smart Parse PDF Resume",

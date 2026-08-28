@@ -69,7 +69,16 @@ export const useAIStore = create<AIStore>()(
 
       getProviderConfig: (providerId) => {
         const state = get();
-        return state.providers[providerId] ?? getDefaultProviderConfig(providerId, state.customProviders);
+        const stored = state.providers[providerId];
+        if (stored) {
+          // 迁移旧版 opencode 直连地址（官方端点不支持浏览器 CORS）→ 新版同源代理路径。
+          // 仅影响读取视图；用户下次保存配置时会把新地址写回 localStorage。
+          if (providerId === 'opencode' && /^https?:\/\/opencode\.ai\//i.test(stored.apiUrl)) {
+            return { ...stored, apiUrl: getDefaultProviderConfig(providerId, state.customProviders).apiUrl };
+          }
+          return stored;
+        }
+        return getDefaultProviderConfig(providerId, state.customProviders);
       },
 
       setProviderVerified: (providerId, verified) =>

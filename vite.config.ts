@@ -218,6 +218,15 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    // opencode 预设的浏览器同源代理（与 vercel.json 的 rewrite 保持一致）：
+    // /api/opencode/* -> https://opencode.ai/zen/go/*
+    proxy: {
+      '/api/opencode': {
+        target: 'https://opencode.ai',
+        changeOrigin: true,
+        rewrite: (p) => p.replace(/^\/api\/opencode/, '/zen/go'),
+      },
+    },
   },
   resolve: {
     alias: {
