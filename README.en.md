@@ -68,7 +68,9 @@ Just open **[https://opresume.vercel.app](https://opresume.vercel.app)** and sta
 
 ### 🛠️ Local development (optional, for developers/contributors)
 
-**Prerequisites**: [Node.js](https://nodejs.org) >= 18, npm >= 8
+**Prerequisites**:
+- Development / build: [Node.js](https://nodejs.org) >= 18, npm >= 8 (use the current Active LTS — no specific version is pinned)
+- Running the native TypeScript test scripts under `scripts/`: [Node.js](https://nodejs.org) >= 22.6 (native type-stripping support)
 
 ```bash
 # 1. Clone this repository

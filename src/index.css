@@ -150,6 +150,19 @@
     break-after: auto;
   }
 
+  /* 预览自适应缩放（ScaledFrame）仅在屏幕上生效：打印时还原为原始尺寸，
+     保证 PDF 导出/打印与编辑缩放无关 */
+  .resume-scale-host {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+  }
+  .resume-scale-content {
+    position: static !important;
+    width: auto !important;
+    transform: none !important;
+  }
+
   /* 打印时隐藏测量容器 */
   .resume-measure-container {
     display: none;

@@ -5,23 +5,21 @@ import qwenIcon from '@/assets/icons/qwen.svg';
  * 千问（通义千问，阿里云百炼 DashScope）
  * 官方 OpenAI 兼容接入：Base URL https://dashscope.aliyuncs.com/compatible-mode/v1
  *
- * 模型 ID 于 2026-08 实测校准（交叉核对阿里云百炼「模型大全」页
- * help.aliyun.com/zh/model-studio/models 与 models.dev alibaba-cn 数据集）。
+ * 模型 ID 于 2026-08 对照阿里云百炼「模型大全」官方页
+ * （help.aliyun.com/zh/model-studio/models）实测校准：
+ * 当前官方在售的文本生成模型为 qwen3.8-max / qwen3.7-plus / qwen3.8-flash；
+ * 旧的 qwen-flash / qwen-turbo / qwen-plus / qwen-max / qwen-long、
+ * qwen3-coder-plus、qwq-plus 等档位已不在官方模型列表，不再收录。
  *
- * 本表为「常用 + 高性价比」精选列表（应用场景：简历内容生成/润色），
- * 未罗列全部 Qwen3.x 变体；完整模型目录见官方模型大全页，
- * 运行期还会用 /v1/models 实测结果过滤。
- * - qwen-flash / qwen3.x-flash 并非免费模型（按量计费），不标注 free；
- * - reasoning 类模型（qwq-plus）按需选用，速度较慢。
+ * 说明：
+ * - 运行期仍会以 /v1/models 实测结果再过滤一次，显示名称与官方 ID 一致；
+ * - qwen3.8-flash 等并非免费模型（按量计费），不标注 free；
+ * - models.dev alibaba-cn 数据集更新滞后（暂缺 qwen3.8-flash），自检以官方页为准。
  */
 const models: AIProviderPreset['models'] = [
-  { id: 'qwen-flash', name: 'Qwen-Flash', description: '轻量快速，成本最低，适合高频调用', tags: ['chat'] },
-  { id: 'qwen-turbo', name: 'Qwen-Turbo', description: '速度快、价格低，日常问答性价比之选', tags: ['chat'] },
-  { id: 'qwen-plus', name: 'Qwen-Plus', description: '默认推荐，综合质量与成本均衡', tags: ['chat'] },
-  { id: 'qwen-long', name: 'Qwen-Long', description: '超长上下文（10M），适合整篇长文档处理', tags: ['chat'] },
-  { id: 'qwen-max', name: 'Qwen-Max', description: '旗舰模型，复杂任务质量最高', tags: ['chat'] },
-  { id: 'qwen3-coder-plus', name: 'Qwen3-Coder-Plus', description: '代码生成与开发辅助', tags: ['code', 'chat'] },
-  { id: 'qwq-plus', name: 'QWQ-Plus（深度思考）', description: '推理增强，适合复杂逻辑分析', tags: ['reasoning'] },
+  { id: 'qwen3.8-max', name: 'Qwen3.8-Max', description: '旗舰模型，复杂任务质量最高', tags: ['chat'] },
+  { id: 'qwen3.7-plus', name: 'Qwen3.7-Plus', description: '默认推荐，综合质量与成本均衡', tags: ['chat'] },
+  { id: 'qwen3.8-flash', name: 'Qwen3.8-Flash', description: '轻量快速，成本最低，适合高频调用', tags: ['chat'] },
 ];
 
 const qwen: AIProviderPreset = {
@@ -31,7 +29,7 @@ const qwen: AIProviderPreset = {
   brandColor: 'bg-fuchsia-600',
   icon: qwenIcon,
   defaultApiUrl: 'https://dashscope.aliyuncs.com/compatible-mode',
-  recommendedModel: 'qwen-plus',
+  recommendedModel: 'qwen3.7-plus',
   apiKeyUrl: 'https://bailian.console.aliyun.com/?apiKey=1',
   website: 'https://dashscope.aliyun.com',
   models,

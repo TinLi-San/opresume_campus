@@ -68,7 +68,9 @@
 
 ### 🛠️ 本地开发（可选，面向开发者/贡献者）
 
-**环境要求**：[Node.js](https://nodejs.org) ≥ 18，npm ≥ 8
+**环境要求**：
+- 开发 / 构建：[Node.js](https://nodejs.org) ≥ 18，npm ≥ 8（建议使用当前 Active LTS 版本，**不锁定具体版本号**）
+- 运行 `scripts/` 下的原生 TypeScript 测试脚本：需 [Node.js](https://nodejs.org) ≥ 22.6（原生类型擦除支持）
 
 ```bash
 # 1. 克隆本仓库

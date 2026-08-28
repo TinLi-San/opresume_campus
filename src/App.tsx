@@ -64,7 +64,7 @@ function App() {
           {...(menuPanelOpen ? { inert: '' } : {})}
         >
           <main className="flex flex-1 justify-center overflow-auto py-8 [overflow-anchor:none] print:overflow-visible print:py-0">
-            <ResumeView config={config} />
+            <ResumeView config={config} scaled />
           </main>
           <FloatingToolbar />
           <Tooltip>

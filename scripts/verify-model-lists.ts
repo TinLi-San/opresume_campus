@@ -4,6 +4,8 @@
  * 目的：把 src/config/ai-providers/*.ts 中手写的预设模型 ID 与真实数据源交叉核对：
  * - models.dev 数据集（https://models.dev/api.json，各厂商官方模型的聚合）；CN 站取对应
  *   -cn 分组（bailing / alibaba-cn / moonshotai-cn / minimax-cn / siliconflow-cn / xiaomi）；
+ * - qwen 额外合并阿里云百炼「模型大全」官方页（help.aliyun.com/zh/model-studio/models）——
+ *   models.dev alibaba-cn 更新滞后（如暂缺 qwen3.8-flash），以官方页为第一手真值；
  * - opencode 走其公开 /v1/models 端点（实测无需鉴权，200）。
  *
  * 用法：
@@ -47,6 +49,25 @@ async function fetchModelsDev(): Promise<Record<string, { models: Record<string,
   return res.json() as Promise<Record<string, { models: Record<string, unknown> }>>;
 }
 
+/**
+ * 从阿里云百炼「模型大全」官方页提取当前模型 ID（qwen 的第一手真值源）。
+ * models.dev 的 alibaba-cn 分组更新滞后（如暂缺 qwen3.8-flash），两者合并使用。
+ */
+async function fetchAliyunModelIds(): Promise<string[]> {
+  const res = await fetch('https://help.aliyun.com/zh/model-studio/models', {
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (!res.ok) throw new Error(`help.aliyun.com HTTP ${res.status}`);
+  const html = await res.text();
+  const text = html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ');
+  const ids = new Set<string>();
+  for (const m of text.matchAll(/\bqwen[\w.\-]*\b|\bqwq[\w.\-]*\b/g)) ids.add(m[0]);
+  return [...ids];
+}
+
 interface Diff {
   notInTruth: string[];
   missingFromPreset: string[];
@@ -75,6 +96,11 @@ async function main(): Promise<void> {
       const json = (await res.json()) as { data: Array<{ id: string }> };
       truthIds = json.data.map((m) => m.id);
       source = 'opencode.ai/zen/go/v1/models（实测 200）';
+    } else if (id === 'qwen') {
+      // 百炼官方页为第一手真值，models.dev alibaba-cn 合并兜底（滞后风险）
+      const official = await fetchAliyunModelIds();
+      truthIds = [...new Set([...official, ...Object.keys(md['alibaba-cn']?.models ?? {})])];
+      source = '阿里云百炼模型大全官方页 + models.dev alibaba-cn';
     } else {
       const key = MDEV_KEY[id];
       truthIds = md[key] ? Object.keys(md[key].models) : [];
