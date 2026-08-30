@@ -247,7 +247,8 @@
   font-size: var(--resume-body-size);
 }
 
-/* 排版：模块间距由 CSS 变量统一控制，穿透 EditableSection 包装层覆盖 Tailwind mb-X
+/* 排版：模块间距单轨——唯一权威来源是外观设置驱动的全局 CSS 变量 --resume-module-gap，
+   穿透 EditableSection 包装层生效；模板令牌不再携带 mb-* 模块间距（历史双轨已清理）。
    切换 preset 时的平滑过渡由 useThemeEffect 中 framer-motion 的 animate() 驱动 CSS 变量数值，
    这里不加 CSS transition（避免与 motion 双重动画冲突）。 */
 div.resume-module > div > section,
@@ -272,6 +273,44 @@ div.resume-layout td,
 div.resume-layout th,
 div.resume-layout a {
   line-height: var(--resume-line-height);
+}
+
+/* Template4/5 单页硬保证：默认样例收敛到一页 A4。
+   与 campus 模板同理——把外观设置拉满也压回紧凑（13px/15px 字号、1.35 行高、18px 模块间距、
+   11mm 页边距），使默认样例在分页分配下恰好一页；较长内容仍可分页（这些模板保留 multiPage 语义）。
+   注：分页分配的可用高度/模块间距仍取 store 预设（16mm/24px），故此处真正把内容高度压回一页的是
+   字号/行高/条目间距钳制；模块间距与页边距钳制用于排版观感与 print 一致。 */
+div.resume-layout .resume-a4-tight {
+  font-size: min(var(--resume-body-size, 14px), 13px);
+}
+div.resume-layout .resume-a4-tight div.resume-module > div > section,
+div.resume-layout .resume-a4-tight div.resume-module > div > div {
+  margin-bottom: min(var(--resume-module-gap), 18px);
+}
+div.resume-layout .resume-a4-tight div.resume-module:last-child > div > section,
+div.resume-layout .resume-a4-tight div.resume-module:last-child > div > div {
+  margin-bottom: 0;
+}
+.resume-a4-tight .resume-padding {
+  padding: min(var(--resume-page-padding-y), 11mm) var(--resume-page-padding-x);
+}
+.resume-a4-tight .resume-body-text {
+  font-size: min(var(--resume-body-size, 14px), 13px);
+}
+.resume-a4-tight .resume-title-text {
+  font-size: min(var(--resume-title-size, 16px), 15px);
+}
+div.resume-layout .resume-a4-tight p,
+div.resume-layout .resume-a4-tight li,
+div.resume-layout .resume-a4-tight span,
+div.resume-layout .resume-a4-tight h1,
+div.resume-layout .resume-a4-tight h2,
+div.resume-layout .resume-a4-tight h3,
+div.resume-layout .resume-a4-tight h4,
+div.resume-layout .resume-a4-tight td,
+div.resume-layout .resume-a4-tight th,
+div.resume-layout .resume-a4-tight a {
+  line-height: min(var(--resume-line-height, 1.5), 1.35);
 }
 
 /* 排版：页边距由 CSS 变量控制（y/x 拆分以便 framer-motion 分别 animate 数值再拼回 mm） */
@@ -503,25 +542,17 @@ div.resume-layout a {
   text-decoration: underline;
 }
 
-/* 模块间距：共享模块与覆盖模块统一使用 --resume-module-gap。
-   注意：EditableSection 会给每个模块再包一层 div，section 在该包装内是唯一子元素，
-   不能简单地用 :last-child 把间距清零，否则模块间距永远不会生效。
-   这里显式让每个 resume-module 内的 campus-section 使用全局模块间距，
-   仅让整个简历的最后一个 resume-module 不占间距。 */
-.campus-section,
-.campus-section-space {
-  /* 单页硬保证：模块间距上限 18px（标准 24px / 宽 32px 都被收敛），
-     即使编辑器里选择“宽间距”也保持一页 A4 */
+/* 模块间距（单轨 + 单页硬保证）：campus 下按结构契约（EditableSection 包装的
+   section/div 直接子层）统一取 --resume-module-gap，上限 18px——标准 24px / 宽 32px
+   都被收敛，即使编辑器里选「宽间距」也保持一页 A4。
+   不再依赖 tokens.spacing.module 那类每模板声明的 mb-* 遗产（已删除）。 */
+.campus-resume .resume-module > div > section,
+.campus-resume .resume-module > div > div {
   margin-bottom: min(var(--resume-module-gap), 18px);
 }
 
-.campus-resume .resume-module > div > .campus-section,
-.campus-resume .resume-module > div > .campus-section-space {
-  margin-bottom: min(var(--resume-module-gap), 26px);
-}
-
-.campus-resume .resume-module:last-child > div > .campus-section,
-.campus-resume .resume-module:last-child > div > .campus-section-space {
+.campus-resume .resume-module:last-child > div > section,
+.campus-resume .resume-module:last-child > div > div {
   margin-bottom: 0;
 }
 
@@ -724,7 +755,7 @@ div.resume-layout a {
 }
 
 .campus-muted {
-  color: #8a8b8e;
+  color: #6b7280; /* 原 #8a8b8e 对白底仅 3.41:1；gray-500 系 4.83:1，WCAG AA 达标 */
 }
 
 /* 富文本要点（工作/项目正文）：无序列表 → 黑色圆点；有序列表 → 黑色编号 */

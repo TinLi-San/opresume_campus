@@ -16,7 +16,7 @@ export function AchievementModule({ config, tokens, itemRange, showTitle = true 
 
   return (
     <EditableSection module="achievementList">
-      <section className={tokens.spacing.module}>
+      <section>
         {showTitle && <SectionTitle title={getTitle(config, 'achievementList', t('module.achievementList'))} icon={moduleIcon} />}
         {list.map((publication, i) => (
           <div

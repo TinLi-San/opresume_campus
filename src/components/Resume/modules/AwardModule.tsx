@@ -16,7 +16,7 @@ export function AwardModule({ config, tokens, itemRange, showTitle = true }: Mod
 
   return (
     <EditableSection module="awardList">
-      <section className={tokens.spacing.module}>
+      <section>
         {showTitle && <SectionTitle title={getTitle(config, 'awardList', t('module.awardList'))} icon={moduleIcon} />}
         {list.map((award, i) => (
           <div

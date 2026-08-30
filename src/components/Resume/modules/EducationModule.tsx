@@ -18,7 +18,7 @@ export function EducationModule({ config, tokens, itemRange, showTitle = true }:
 
   return (
     <EditableSection module="educationList">
-      <section className={tokens.spacing.module}>
+      <section>
         {showTitle && <SectionTitle title={getTitle(config, 'educationList', t('module.educationList'))} icon={moduleIcon} />}
         {list.map((edu, i) => (
           <div

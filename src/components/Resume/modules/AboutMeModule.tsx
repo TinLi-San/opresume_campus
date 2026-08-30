@@ -17,7 +17,7 @@ export function AboutMeModule({ config, tokens, showTitle = true }: ModuleProps)
 
   return (
     <EditableSection module="aboutme">
-      <section className={tokens.spacing.module}>
+      <section>
         {showTitle && <SectionTitle title={getTitle(config, 'aboutme', t('module.aboutme'))} icon={moduleIcon} />}
         <PolishHost>
           <RichContent content={config['x-op-aboutmeHtml']} textSize={tokens.typography.contentSize} />

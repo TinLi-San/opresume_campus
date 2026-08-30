@@ -134,10 +134,15 @@ export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
   const isProcessingRef = useRef(false);
   /** 会话标记：每次发起解析时递增，关闭/取消时也递增，用于丢弃过期的异步回调 */
   const sessionIdRef = useRef(0);
+  /** 在途 AI 请求的中止控制器：取消/关闭弹窗时 abort() 以停止计费 */
+  const abortRef = useRef<AbortController | null>(null);
 
   /** 真正执行关闭：重置全部状态，并使正在进行的异步流程失效 */
   const performClose = useCallback(() => {
     sessionIdRef.current += 1;
+    // 中止在途 AI 请求，取消即止损（不再消耗 BYOK 额度）
+    abortRef.current?.abort();
+    abortRef.current = null;
     setState({ step: 'upload' });
     setDragging(false);
     setFileName('');
@@ -184,6 +189,10 @@ export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
     // 生成新的会话标记，用于在 await 之后判断本次流程是否已被取消
     const currentSession = ++sessionIdRef.current;
     const isStale = () => sessionIdRef.current !== currentSession;
+    // 创建可中止的在途请求控制器：取消/关闭弹窗时 abort()，立即停止本轮 AI 调用与计费
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const signal = controller.signal;
 
     setFileName(file.name);
     lastFileRef.current = file;
@@ -214,7 +223,7 @@ export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
       ];
 
       // 2a. 首次调用：response_format=json_object 约束结构化输出
-      let aiResponse = await generateText(aiConfig, baseMessages(), undefined, 4096, undefined, true);
+      let aiResponse = await generateText(aiConfig, baseMessages(), signal, 4096, undefined, true);
       if (isStale()) return;
 
       // 2b. 解析 + 结构校验；不通过则带着上一次输出与问题清单发起修复（最多 2 轮）
@@ -238,7 +247,7 @@ export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
             { role: 'assistant', content: aiResponse },
             { role: 'user', content: buildRepairPrompt(issues) },
           ],
-          undefined,
+          signal,
           4096,
           undefined,
           true,
@@ -266,6 +275,8 @@ export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
       // 进入预览阶段
       setState({ step: 'preview', data: resume });
     } catch (error) {
+      // 用户取消/关闭触发的请求中止：静默返回，不弹错误状态（会话号已递增，isStale 兜底）
+      if (error instanceof DOMException && error.name === 'AbortError') return;
       if (isStale()) return;
       const message = error instanceof Error ? error.message : t('importPDF.errorUnknown');
       const isCors = message.includes('CORS');

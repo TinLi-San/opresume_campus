@@ -18,7 +18,7 @@ export function WorkExpModule({ config, tokens, itemRange, showTitle = true }: M
 
   return (
     <EditableSection module="workExpList">
-      <section className={tokens.spacing.module}>
+      <section>
         {showTitle && <SectionTitle title={getTitle(config, 'workExpList', t('module.workExpList'))} icon={moduleIcon} />}
         {list.map((work, i) => (
           <div key={work['x-op-id'] ?? i} className={tokens.spacing.item} data-item-index={indexOffset + i}>

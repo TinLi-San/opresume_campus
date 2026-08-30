@@ -1,4 +1,5 @@
-import type { TemplateDefinition, StyleTokens, LayoutShellProps } from '../types';
+import type { TemplateDefinition, LayoutShellProps } from '../types';
+import { defineTokens } from '../tokens-defaults';
 import { useTranslation } from 'react-i18next';
 import {
   EditableSection,
@@ -26,14 +27,12 @@ function SectionTitle({ title, icon }: { title: string; icon?: string }) {
   );
 }
 
-const tokens: StyleTokens = {
-  spacing: { module: 'mb-5', item: 'mb-3' },
-  typography: { titleWeight: 'font-semibold', titleSize: 'resume-title-text', contentSize: 'resume-body-text' },
-  colors: { primary: 'text-gray-900', secondary: 'text-gray-600', muted: 'text-gray-500' },
+const tokens = defineTokens({
+  spacing: { item: 'mb-1' },
   components: { SectionTitle },
   variants: { skill: 'list', project: 'compact', education: 'inline' },
   layout: { awardTimeInline: true, flexAlign: 'items-baseline' },
-};
+});
 
 function Template5Shell({ config, mainContent, pageIndex = 0 }: LayoutShellProps) {
   const basics = config.basics;
@@ -44,7 +43,7 @@ function Template5Shell({ config, mainContent, pageIndex = 0 }: LayoutShellProps
   const mask = usePrivacyMask();
 
   return (
-    <div className="min-h-[297mm] w-[210mm] bg-white text-gray-800 shadow-lg print:shadow-none">
+    <div className="resume-a4-tight min-h-[297mm] w-[210mm] bg-white text-gray-800 shadow-lg print:shadow-none">
       <div className="resume-padding">
         {pageIndex === 0 && (
           <EditableSection module="profile">

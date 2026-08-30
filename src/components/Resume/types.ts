@@ -2,10 +2,18 @@ import type { ReactNode, ComponentType } from 'react';
 import type { JsonResume } from '@/types/json-resume';
 import type { ModuleLayout } from '@/types/resume';
 
-/** 样式令牌 — 控制共享模块的视觉差异 */
+/**
+ * 样式令牌 — 控制共享模块的视觉差异。
+ *
+ * 默认值集中在 `tokens-defaults.ts` 的 BASE_STYLE_TOKENS，模板经 defineTokens()
+ * 只声明差异部分（深合并），不要再全量重声明。
+ *
+ * 注意：模块间距是**单轨机制**——由外观设置驱动的全局 CSS 变量
+ * `--resume-module-gap` 控制（见 index.css `div.resume-module > div > section`），
+ * 不属于本令牌；这里只保留条目级间距 spacing.item。
+ */
 export interface StyleTokens {
   spacing: {
-    module: string;
     item: string;
   };
   typography: {
@@ -45,8 +53,13 @@ export interface ModuleProps {
 /**
  * 模板定义 — 每个模板实现此接口。
  *
- * 新增模板只需在 templates/ 目录下新建文件并 default export 此接口的实现，
- * 即可被 import.meta.glob 自动发现和注册，无需手动修改其他文件。
+ * 新增模板的完整清单（不是 1 个文件！）：
+ *   1. 在 templates/ 目录新建 templateN.tsx，default export 本接口
+ *      （import.meta.glob 会自动注册渲染通路，这一步确实零接线）；
+ *   2. 在 zh-CN.json / en-US.json 的 `template` 组补 `template.${id}` 键
+ *      （模板选择器按 `template.${id}` 取显示名，缺键时只能回退裸 id）；
+ *   3. 若使用带 `templateTag.${tag}` 的新标签，同样需要两语言键。
+ * tokens 用 defineTokens(差异) 声明，公共默认见 tokens-defaults.ts。
  */
 export interface TemplateDefinition {
   /** 模板唯一标识，同时用作 i18n 键名（`template.${id}`）和布局配置键 */

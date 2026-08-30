@@ -8,13 +8,24 @@ interface SkillListProps {
   skills: JsonSkill[];
   tokens: ModuleProps['tokens'];
   showLevel: boolean;
+  /** 条目索引偏移（itemRange 切片续页时保持全局序号） */
+  offset: number;
 }
 
 /** 分组技能渲染：组名（粗体）+ 标签一行多门（顿号连接，自然换行） */
-function SkillGroupRow({ skill, tokens }: { skill: JsonSkill; tokens: ModuleProps['tokens'] }) {
+function SkillGroupRow({
+  skill,
+  tokens,
+  itemIndex,
+}: {
+  skill: JsonSkill;
+  tokens: ModuleProps['tokens'];
+  /** 该条目的全局序号（data-item-index，供分页测量） */
+  itemIndex: number;
+}) {
   const tags = skill.keywords ?? [];
   return (
-    <div className={tokens.spacing.item}>
+    <div className={tokens.spacing.item} data-item-index={itemIndex}>
       <span className={cn(tokens.typography.contentSize, tokens.typography.titleWeight, tokens.colors.primary)}>
         {skill.name}：
       </span>
@@ -25,14 +36,14 @@ function SkillGroupRow({ skill, tokens }: { skill: JsonSkill; tokens: ModuleProp
   );
 }
 
-function SkillBarList({ skills, tokens, showLevel }: SkillListProps) {
+function SkillBarList({ skills, tokens, showLevel, offset }: SkillListProps) {
   return (
     <>
       {skills.map((skill, i) =>
         skill.keywords?.length ? (
-          <SkillGroupRow key={skill['x-op-id'] ?? i} skill={skill} tokens={tokens} />
+          <SkillGroupRow key={skill['x-op-id'] ?? i} skill={skill} tokens={tokens} itemIndex={offset + i} />
         ) : (
-          <div key={skill['x-op-id'] ?? i} className={tokens.spacing.item}>
+          <div key={skill['x-op-id'] ?? i} className={tokens.spacing.item} data-item-index={offset + i}>
             <div className="mb-0.5 flex items-center justify-between text-xs">
               <span>{skill.name}</span>
             </div>
@@ -51,17 +62,21 @@ function SkillBarList({ skills, tokens, showLevel }: SkillListProps) {
   );
 }
 
-function SkillNumberList({ skills, tokens, showLevel }: SkillListProps) {
+function SkillNumberList({ skills, tokens, showLevel, offset }: SkillListProps) {
   return (
     <ul className="list-inside space-y-1">
       {skills.map((skill, i) => (
-        <li key={skill['x-op-id'] ?? i} className={tokens.spacing.item}>
+        <li key={skill['x-op-id'] ?? i} className={tokens.spacing.item} data-item-index={offset + i}>
           {skill.keywords?.length ? (
-            <SkillGroupRow skill={skill} tokens={tokens} />
+            // 分组内容直接并入 li（避免嵌套条目造成重复 data-item-index）
+            <span>
+              <span className={cn(tokens.typography.titleWeight, tokens.colors.primary)}>{skill.name}：</span>
+              <span className={tokens.colors.secondary}>{(skill.keywords ?? []).join('、')}</span>
+            </span>
           ) : (
             <span className={cn(tokens.typography.contentSize, tokens.colors.primary)}>
               <span className={cn('mr-1 text-xs', tokens.typography.titleWeight, 'text-resume-primary')}>
-                {i + 1}.
+                {offset + i + 1}.
               </span>
               {skill.name}
               {showLevel && skill.level && (
@@ -75,7 +90,7 @@ function SkillNumberList({ skills, tokens, showLevel }: SkillListProps) {
   );
 }
 
-function SkillTagList({ skills, tokens }: SkillListProps) {
+function SkillTagList({ skills, tokens, offset }: SkillListProps) {
   return (
     <div className="flex flex-wrap gap-2">
       {skills.map((skill, i) =>
@@ -86,6 +101,7 @@ function SkillTagList({ skills, tokens }: SkillListProps) {
             className={cn('rounded-full px-3 py-1', tokens.typography.contentSize, tokens.colors.primary)}
             style={{ backgroundColor: 'color-mix(in srgb, var(--resume-primary) 15%, transparent)' }}
             title={(skill.keywords ?? []).join('、')}
+            data-item-index={offset + i}
           >
             {skill.name}: {(skill.keywords ?? []).join('、')}
           </span>
@@ -94,6 +110,7 @@ function SkillTagList({ skills, tokens }: SkillListProps) {
             key={skill['x-op-id'] ?? i}
             className={cn('rounded-full px-3 py-1', tokens.typography.contentSize, tokens.colors.primary)}
             style={{ backgroundColor: 'color-mix(in srgb, var(--resume-primary) 15%, transparent)' }}
+            data-item-index={offset + i}
           >
             {skill.name}
           </span>
@@ -103,11 +120,16 @@ function SkillTagList({ skills, tokens }: SkillListProps) {
   );
 }
 
-export function SkillModule({ config, tokens, showTitle = true }: ModuleProps) {
+export function SkillModule({ config, tokens, itemRange, showTitle = true }: ModuleProps) {
   const { t } = useTranslation();
   const moduleIcon = useModuleIcon('skillList');
-  const skillList = config.skills as JsonSkill[] | undefined;
-  if (isHidden(config, 'skillList') || !skillList?.length) return null;
+  const allSkills = config.skills as JsonSkill[] | undefined;
+  if (isHidden(config, 'skillList') || !allSkills?.length) return null;
+
+  // 分页契约：与 Work/Project/Education 等列表模块一致——按 itemRange 切片，
+  // 每个条目始终带 data-item-index（measureFromDOM 据此在条目边界拆分）。
+  const list = itemRange ? allSkills.slice(itemRange[0], itemRange[1]) : allSkills;
+  const offset = itemRange ? itemRange[0] : 0;
 
   const { SectionTitle } = tokens.components;
   // 「是否显示熟练度」开关：x-op-showSkillLevel（默认 true=跟随数据，原文无 level 自然不显示；
@@ -116,11 +138,11 @@ export function SkillModule({ config, tokens, showTitle = true }: ModuleProps) {
 
   return (
     <EditableSection module="skillList">
-      <div className={tokens.spacing.module}>
+      <div>
         {showTitle && <SectionTitle title={getTitle(config, 'skillList', t('module.skillList'))} icon={moduleIcon} />}
-        {tokens.variants.skill === 'bar' && <SkillBarList skills={skillList} tokens={tokens} showLevel={showLevel} />}
-        {tokens.variants.skill === 'list' && <SkillNumberList skills={skillList} tokens={tokens} showLevel={showLevel} />}
-        {tokens.variants.skill === 'tags' && <SkillTagList skills={skillList} tokens={tokens} showLevel={showLevel} />}
+        {tokens.variants.skill === 'bar' && <SkillBarList skills={list} tokens={tokens} showLevel={showLevel} offset={offset} />}
+        {tokens.variants.skill === 'list' && <SkillNumberList skills={list} tokens={tokens} showLevel={showLevel} offset={offset} />}
+        {tokens.variants.skill === 'tags' && <SkillTagList skills={list} tokens={tokens} showLevel={showLevel} offset={offset} />}
       </div>
     </EditableSection>
   );

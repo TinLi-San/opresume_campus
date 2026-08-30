@@ -4,8 +4,10 @@
  * 使用 Vite 的 import.meta.glob 扫描当前目录下所有 template*.tsx 文件，
  * 每个文件必须 default export 一个 TemplateDefinition 对象。
  *
- * 新增模板时只需在此目录新建文件（如 template5.tsx）并 default export，
- * 即可被自动发现——无需手动修改任何其他文件。
+ * 自动注册只覆盖**渲染通路**（这里收集 definitions/templateIds）：
+ * 新增模板仍需在两语言包（zh-CN.json / en-US.json）为 `template.${id}` 补显示名，
+ * 否则模板选择器按 `template.${id}` 取文案时会回退成裸 id。完整清单见
+ * `src/components/Resume/types.ts` 中 `TemplateDefinition` 的注释。
  */
 import type { TemplateDefinition } from '../types';
 

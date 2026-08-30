@@ -1,4 +1,5 @@
-import type { TemplateDefinition, StyleTokens, LayoutShellProps } from '../types';
+import type { TemplateDefinition, LayoutShellProps } from '../types';
+import { defineTokens } from '../tokens-defaults';
 import { useTranslation } from 'react-i18next';
 import { EditableSection, getTitle, ResumeAvatar, calculateAge, getProfileIcon, useCustomFieldIconMap, useModuleIcon, usePrivacyMask } from '../shared';
 import { DynamicIcon } from '@/components/DynamicIcon';
@@ -33,16 +34,14 @@ function InfoItem({ icon, label, value }: { icon?: string; label: string; value?
   );
 }
 
-/* ---------- StyleTokens ---------- */
+/* ---------- StyleTokens（差异声明，默认见 tokens-defaults.ts） ---------- */
 
-const tokens: StyleTokens = {
-  spacing: { module: 'mb-5', item: 'mb-3' },
-  typography: { titleWeight: 'font-bold', titleSize: 'resume-title-text', contentSize: 'resume-body-text' },
-  colors: { primary: 'text-gray-800', secondary: 'text-gray-500', muted: 'text-gray-400' },
+const tokens = defineTokens({
+  spacing: { item: 'mb-1' },
   components: { SectionTitle },
   variants: { skill: 'list', project: 'detailed', education: 'inline' },
   layout: { awardTimeInline: false, flexAlign: 'items-baseline' },
-};
+});
 
 /* ---------- LayoutShell ---------- */
 
@@ -56,7 +55,7 @@ function Template4Shell({ config, mainContent, pageIndex = 0 }: LayoutShellProps
   const mask = usePrivacyMask();
 
   return (
-    <div className="relative min-h-[297mm] w-[210mm] bg-white shadow-lg print:shadow-none">
+    <div className="resume-a4-tight relative min-h-[297mm] w-[210mm] bg-white shadow-lg print:shadow-none">
       <div className="resume-padding resume-padding-offset-left">
         {pageIndex === 0 && (
           <>

@@ -1,4 +1,5 @@
-import type { TemplateDefinition, StyleTokens, LayoutShellProps } from '../types';
+import type { TemplateDefinition, LayoutShellProps } from '../types';
+import { defineTokens } from '../tokens-defaults';
 import { useTranslation } from 'react-i18next';
 import {
   EditableSection,
@@ -38,23 +39,19 @@ function SidebarSectionTitle({ title, icon }: { title: string; icon?: string }) 
   );
 }
 
-const tokens: StyleTokens = {
-  spacing: { module: 'mb-5', item: 'mb-3' },
-  typography: { titleWeight: 'font-semibold', titleSize: 'resume-title-text', contentSize: 'resume-body-text' },
-  colors: { primary: 'text-gray-900', secondary: 'text-gray-600', muted: 'text-gray-500' },
+const tokens = defineTokens({
   components: { SectionTitle },
   variants: { skill: 'tags', project: 'detailed', education: 'stacked' },
   layout: { awardTimeInline: false, flexAlign: 'items-start' },
-};
+});
 
-const sidebarTokens: StyleTokens = {
-  spacing: { module: 'mb-5', item: 'mb-2' },
-  typography: { titleWeight: 'font-semibold', titleSize: 'resume-title-text', contentSize: 'resume-body-text' },
-  colors: { primary: 'text-white', secondary: 'text-white/75', muted: 'text-white/55' },
+/** 侧栏为深底（bg-resume-primary）：弱化色用 white/75（对默认主色 #2f5785 约 5.0:1，AA 达标） */
+const sidebarTokens = defineTokens({
   components: { SectionTitle: SidebarSectionTitle },
+  colors: { primary: 'text-white', secondary: 'text-white/85', muted: 'text-white/75' },
   variants: { skill: 'list', project: 'compact', education: 'stacked' },
   layout: { awardTimeInline: true, flexAlign: 'items-start' },
-};
+});
 
 function Template6Shell({ config, sidebarContent, mainContent }: LayoutShellProps) {
   const basics = config.basics;

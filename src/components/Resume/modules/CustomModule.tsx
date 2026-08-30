@@ -37,7 +37,7 @@ export function CustomModule({
 
   return (
     <EditableSection module={moduleId}>
-      <section className={tokens.spacing.module}>
+      <section>
         {showTitle && <SectionTitle title={title} icon={moduleIcon} />}
         {customModule.contentHtml && (
           <PolishHost>

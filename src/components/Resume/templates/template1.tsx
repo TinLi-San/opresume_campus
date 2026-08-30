@@ -1,4 +1,5 @@
-import type { TemplateDefinition, StyleTokens, LayoutShellProps } from '../types';
+import type { TemplateDefinition, LayoutShellProps } from '../types';
+import { defineTokens } from '../tokens-defaults';
 import { useTranslation } from 'react-i18next';
 import { EditableSection, ResumeAvatar, calculateAge, getProfileIcon, useCustomFieldIconMap, ProfileField, usePrivacyMask } from '../shared';
 import { DynamicIcon } from '@/components/DynamicIcon';
@@ -14,16 +15,12 @@ function SectionTitle({ title, icon }: { title: string; icon?: string }) {
   );
 }
 
-/* ---------- StyleTokens ---------- */
+/* ---------- StyleTokens（差异声明，默认见 tokens-defaults.ts） ---------- */
 
-const tokens: StyleTokens = {
-  spacing: { module: 'mb-4', item: 'mb-2' },
-  typography: { titleWeight: 'font-bold', titleSize: 'resume-title-text', contentSize: 'resume-body-text' },
-  colors: { primary: 'text-gray-800', secondary: 'text-gray-600', muted: 'text-gray-500' },
+const tokens = defineTokens({
   components: { SectionTitle },
-  variants: { skill: 'bar', project: 'compact', education: 'stacked' },
-  layout: { awardTimeInline: false, flexAlign: 'items-start' },
-};
+  variants: { skill: 'bar' },
+});
 
 /* ---------- LayoutShell ---------- */
 

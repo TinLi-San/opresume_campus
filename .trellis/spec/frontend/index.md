@@ -131,17 +131,26 @@ localStorage → Zustand Store → React Components → 用户交互 → Zustand
    - 在 `src/components/Editor/schemas.ts` 中定义表单 Schema
    - 在 `src/components/Resume/modules/` 中渲染字段
 
-### 添加新模块
+### 添加新模块（新栏目）
 
-1. 在 `src/components/Resume/modules/` 创建模块组件
+1. 在 `src/types/json-resume.ts` 定义字段类型（标准字段直接用；`x-op-` 扩展字段需在此声明类型）
 2. 在 `src/components/Editor/schemas.ts` 定义表单 Schema
-3. 在 `src/components/Resume/modules/index.tsx` 注册模块
+3. 在 `src/components/Resume/modules/` 创建模块组件（遵守 `ModuleProps` 契约；列表型必须消费 `itemRange` 并为每个条目输出 `data-item-index`，否则分页算法无法在条目边界拆分）
+4. 在 `src/components/Resume/modules/index.tsx` 注册模块
+5. 在目标模板的 `defaultLayout` 中列出该模块（否则不渲染）
+6. 在 `zh-CN.json` / `en-US.json` 的 `module` 组补该模块标题键
+7. （可选）在 `templateTag` 组补两语言键，供模板选择器展示特征标签
+
+> 走通「新增栏目」路径通常涉及 6-7 个文件（类型 + schema + 模块组件 + 注册 + 布局 + 两语言包）。
 
 ### 添加新模板
 
-1. 在 `src/components/Resume/templates/` 创建 `template5.tsx`（小写 `template*.tsx`）
-2. 默认导出 `TemplateDefinition` 对象
-3. 模板会被 `src/components/Resume/templates/index.ts` 通过 `import.meta.glob` 自动注册，无需修改 `config/`
+1. 在 `src/components/Resume/templates/` 新建 `templateN.tsx`（小写 `template*.tsx`），default export `TemplateDefinition`
+2. 在 `src/i18n/locales/zh-CN.json` 与 `en-US.json` 的 `template` 组补 `template.${id}` 显示名（模板选择器按 `template.${id}` 取文案；缺键时只能回退成裸 id）
+3. 若使用带 `templateTag.${tag}` 的新特征标签，同样补两语言键
+4. `defaultLayout` 必须声明（否则 `config/layout.ts` 的默认布局会回退到 fallback）
+
+> 注意：`import.meta.glob` 只自动注册**渲染通路**，i18n 显示名仍需两语言包，因此新增一个可用模板至少涉及 **3 个文件**（模板 + zh-CN/en-US）。完整清单见 `src/components/Resume/types.ts` 中 `TemplateDefinition` 的注释。
 
 ---
 

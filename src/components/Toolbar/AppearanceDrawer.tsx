@@ -359,7 +359,9 @@ export function AppearanceDrawer() {
             <div className="grid grid-cols-[repeat(auto-fill,minmax(13rem,1fr))] justify-items-center gap-x-5 gap-y-6 py-2">
               {templateIds.map((key) => {
                 const selected = template === key;
-                const label = t(`template.${key}`);
+                // 缺 i18n 键时回退成裸 id（未被 t() 替换时它等于原键名）
+                const labelKey = `template.${key}`;
+                const label = t(labelKey) === labelKey ? key : t(labelKey);
                 return (
                   <button
                     key={key}

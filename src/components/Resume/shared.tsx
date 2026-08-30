@@ -309,7 +309,7 @@ export function ProfileField({
   return (
     <p className={cn('flex items-center gap-1.5', className)}>
       <DynamicIcon name={icon} className="h-3 w-3 shrink-0 opacity-60" />
-      {!showIcons && label && <span className="shrink-0 text-gray-400">{label}:</span>}
+      {!showIcons && label && <span className="shrink-0 text-gray-500">{label}:</span>}
       <span>{children}</span>
     </p>
   );

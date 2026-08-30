@@ -32,7 +32,7 @@ import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { SYSTEM_PROMPT, buildUserPrompt } from '../src/utils/pdf-prompts.ts';
 import { isValidAIResumeData, mapAIJsonToResume } from '../src/services/resume-mapper.ts';
 import { validateAIResumeJson } from '../src/services/resume-validate.ts';
-import { pageItemsToText, normalizeText, capTextForAI } from '../src/utils/pdf-text.ts';
+import { pageItemsToStructuredLines, sortLinesInReadingOrder, structuredLinesToText, cleanExtractedText, capTextForAI } from '../src/utils/pdf-text.ts';
 import opencodePreset from '../src/config/ai-providers/opencode.ts';
 
 const RESUME_DIR = path.resolve(import.meta.dirname, '../test-data/resumes');
@@ -99,10 +99,13 @@ async function extractText(filePath: string): Promise<{ text: string; chars: num
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i);
     const content = await page.getTextContent();
-    // 按视觉行重建文本（保留段落/标题/条目边界）
-    parts.push(pageItemsToText(content.items));
+    // 结构化行 → 阅读顺序排序（双栏重排）→ 重建文本
+    const viewport = page.getViewport({ scale: 1 });
+    const lines = pageItemsToStructuredLines(content.items);
+    const ordered = sortLinesInReadingOrder(lines, viewport.width);
+    parts.push(structuredLinesToText(ordered.lines, { column: ordered.column, count: ordered.count }));
   }
-  const text = capTextForAI(normalizeText(parts.join('\n\n')));
+  const text = capTextForAI(cleanExtractedText(parts.join('\n\n')));
   const trimmed = text.trim();
   if (!trimmed || trimmed.length < MIN_TEXT_CHARS) {
     throw new Error(`insufficient text: ${trimmed.length} chars < ${MIN_TEXT_CHARS}`);
@@ -151,6 +154,22 @@ async function chatCompletion(
   return { status: res.status, text: content, ms: Date.now() - t0 };
 }
 
+/**
+ * 带自动重试的调用（P2-13）：opencode 端点偶发 120s 超时，AI 阶段失败自动重试一次。
+ */
+async function callWithRetry<T>(fn: () => Promise<T>, times = 2): Promise<T> {
+  let lastErr: unknown;
+  for (let i = 0; i < times; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      lastErr = e;
+      console.warn(`    [retry] AI call failed (${i + 1}/${times}): ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+  throw lastErr;
+}
+
 /** JSON 提取：复刻 ai-generate.ts#extractJSON */
 function extractJSON(text: string): unknown {
   const jsonText =
@@ -177,6 +196,16 @@ interface ExpectedManifest {
   basics?: { name?: string | null; email?: string | null; phone?: string | null; label?: string | null; city?: string | null };
   counts?: { education?: number; work?: number; projects?: number; skills?: number; awards?: number };
   countTolerance?: number;
+  /** 内容级：教育经历首条须包含的修读课程（子串匹配） */
+  educationCourses?: string[];
+  /** 内容级：education 任一条目须包含的 GPA/成绩子串（子串匹配，P1-9） */
+  educationScore?: string[];
+  /** 内容级：所有工作条目中须能找到的岗位子串（无序匹配，P1-8） */
+  workPositions?: string[];
+  /** 内容级：禁止为原文无熟练度的技能注入 level（P0-2）；缺省 false=不启用该断言 */
+  skillsNoFabrication?: boolean;
+  /** 内容级：奖项 date 不得被编造成 "YYYY-01" 月份（P1-11）；缺省 false=不启用 */
+  awardsNoFabricatedMonth?: boolean;
   notes?: string;
 }
 
@@ -238,7 +267,69 @@ function scoreCase(mapped: Record<string, unknown>, expected: ExpectedManifest):
   const countsOk = countTotal === 0 || countPass / countTotal >= 0.6;
 
   detail.push(`counts: ${countPass}/${countTotal} within tolerance`);
-  const pass = nameOk && emailOk && phoneOk && labelOk && cityOk && countsOk;
+
+  // 内容级：修读课程（education[0].courses 需覆盖期望课程，子串匹配）
+  let coursesOk = true;
+  const expCourses = expected.educationCourses ?? [];
+  if (expCourses.length > 0) {
+    const eduList = (mapped.education as Record<string, unknown>[] | undefined) ?? [];
+    const actualCourses: string[] = Array.isArray(eduList[0]?.courses) ? (eduList[0].courses as string[]) : [];
+    const missing = expCourses.filter(
+      (c) => !actualCourses.some((a) => norm(a).includes(norm(c)) || norm(c).includes(norm(a))),
+    );
+    coursesOk = missing.length === 0;
+    detail.push(coursesOk ? `courses: OK` : `courses: MISS (missing ${missing.join(' / ')})`);
+  }
+
+  // 内容级：GPA/成绩（P1-9）——任一 education 条目的文本须包含期望子串
+  let scoreOk = true;
+  const expScores = expected.educationScore ?? [];
+  if (expScores.length > 0) {
+    const eduList = (mapped.education as Record<string, unknown>[] | undefined) ?? [];
+    // 去空格匹配：容忍 AI 输出 "GPA 3.7 / 4.0" 与原文 "3.7/4.0" 的空格差异
+    const eduTextNoSpace = eduList.map((e) => JSON.stringify(e)).join(' ').replace(/\s+/g, '');
+    const missing = expScores.filter((s) => !eduTextNoSpace.includes(s.replace(/\s+/g, '')));
+    scoreOk = missing.length === 0;
+    detail.push(scoreOk ? `educationScore: OK` : `educationScore: MISS (missing ${missing.join(' / ')})`);
+  }
+
+  // 内容级：岗位名称（P1-8）——所有 work 条目能找到每个期望岗位子串（无序匹配）
+  let posOk = true;
+  const expPositions = expected.workPositions ?? [];
+  if (expPositions.length > 0) {
+    const workList = (mapped.work as Record<string, unknown>[] | undefined) ?? [];
+    const positionTexts = workList.map((w) => String(w.position ?? ''));
+    const missingPos = expPositions.filter(
+      (p) => !positionTexts.some((a) => norm(a).includes(norm(p))),
+    );
+    posOk = missingPos.length === 0;
+    detail.push(posOk ? `workPositions: OK` : `workPositions: MISS (missing ${missingPos.join(' / ')})`);
+  }
+
+  // 内容级：技能禁止杜撰熟练度（P0-2）
+  let skillOk = true;
+  if (expected.skillsNoFabrication) {
+    const skills = (mapped.skills as Record<string, unknown>[] | undefined) ?? [];
+    const fabricated = skills.filter(
+      (s) => !!s.level && !(Array.isArray(s.keywords) && (s.keywords as unknown[]).length > 0),
+    );
+    skillOk = fabricated.length === 0;
+    detail.push(skillOk ? `skillsNoFabrication: OK` : `skillsNoFabrication: MISS (${fabricated.length} skills got level injected: ${fabricated.map((f) => f.name).join(', ')})`);
+  }
+
+  // 内容级：奖项月份编造（P1-11）
+  let awardMonthOk = true;
+  if (expected.awardsNoFabricatedMonth) {
+    const awards = (mapped.awards as Record<string, unknown>[] | undefined) ?? [];
+    const bad = awards.filter((a) => {
+      const d = String(a.date ?? '');
+      return /^\d{4}-01$/.test(d);
+    });
+    awardMonthOk = bad.length === 0;
+    detail.push(awardMonthOk ? 'awardsNoFabricatedMonth: OK' : `awardsNoFabricatedMonth: MISS (${bad.map((b) => b.date).join(', ')})`);
+  }
+
+  const pass = nameOk && emailOk && phoneOk && labelOk && cityOk && countsOk && coursesOk && scoreOk && posOk && skillOk && awardMonthOk;
   return { pass, detail };
 }
 
@@ -307,7 +398,8 @@ async function main(): Promise<void> {
     },
     {
       id: 'opencode',
-      baseUrl: opencodePreset.defaultApiUrl,
+      // Node 直连（非浏览器代理）：官方端点可用 OPENCODE_API_URL 覆盖，默认 /api/opencode 是浏览器代理路径
+      baseUrl: process.env.OPENCODE_API_URL?.trim() || 'https://opencode.ai/zen/go',
       relay: opencodePreset.relay,
       model: process.env.OPENCODE_MODEL?.trim() || opencodePreset.recommendedModel,
       apiKey: opencodeKey,
@@ -378,10 +470,10 @@ async function main(): Promise<void> {
         aiOk: false, jsonOk: false, mapped: null, score: null, pass: false,
       };
       try {
-        const ai = await chatCompletion(provider, [
+        const ai = await callWithRetry(() => chatCompletion(provider, [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: buildUserPrompt(extracted.text) },
-        ]);
+        ]));
         base.httpStatus = ai.status;
         base.aiMs = ai.ms;
         if (ai.status !== 200) {

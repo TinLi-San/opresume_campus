@@ -21,7 +21,8 @@ import { useTranslation } from 'react-i18next';
 import { School } from 'lucide-react';
 import { DynamicIcon } from '@/components/DynamicIcon';
 import { toast } from 'sonner';
-import type { TemplateDefinition, StyleTokens } from '../types';
+import type { TemplateDefinition } from '../types';
+import { defineTokens } from '../tokens-defaults';
 import type { JsonResume } from '@/types/json-resume';
 import { useUIStore } from '@/store/ui';
 import { useResumeStore } from '@/store/resume';
@@ -366,17 +367,13 @@ function Template7Shell({ config, mainContent, pageIndex = 0 }: {
 }
 
 /* ------------------------------------------------------------------ */
-/*  StyleTokens                                                       */
+/*  StyleTokens（差异声明，默认见 tokens-defaults.ts）                  */
+/*  注：本模板的 5 个覆盖渲染器（CampusModules.tsx）走 campus-* 固定类， */
+/*  单页钳制优先于令牌；这里维护的是 aboutme/achievementList 等共享模块。 */
 /* ------------------------------------------------------------------ */
 
-const tokens: StyleTokens = {
-  spacing: { module: 'campus-section-space', item: 'campus-item-space' },
-  typography: {
-    titleWeight: 'font-semibold',
-    titleSize: 'resume-title-text',
-    contentSize: 'resume-body-text',
-  },
-  colors: { primary: 'text-gray-900', secondary: 'text-gray-600', muted: 'text-gray-400' },
+const tokens = defineTokens({
+  spacing: { item: 'campus-item-space' },
   components: {
     SectionTitle: (props) => {
       const showIcons = useUIStore((s) => s.showIcons);
@@ -385,7 +382,7 @@ const tokens: StyleTokens = {
   },
   variants: { skill: 'list', project: 'detailed', education: 'inline' },
   layout: { awardTimeInline: true, flexAlign: 'items-baseline' },
-};
+});
 
 /* ------------------------------------------------------------------ */
 /*  export                                                            */
