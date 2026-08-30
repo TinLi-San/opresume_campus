@@ -15,12 +15,15 @@ import {
   User,
   RefreshCw,
   X,
+  Layers,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useAIStore } from '@/store/ai';
 import { useResumeStore } from '@/store/resume';
+import { useUIStore } from '@/store/ui';
 import { getProviderPreset } from '@/config/ai-providers';
+import { getEffectiveLayout } from '@/config/layout';
 import { extractTextFromPDF } from '@/services/pdf-parser';
 import { generateText, extractJSON } from '@/services/ai-generate';
 import { mapAIJsonToResume, isValidAIResumeData } from '@/services/resume-mapper';
@@ -84,6 +87,32 @@ const PROGRESS_STEPS: readonly {
   },
 ];
 
+/**
+ * 把 AI 识别出的自定义模块（x-op-customModules）注册进当前模板的模块布局，
+ * 否则模板不会渲染它们（自定义模块必须出现在 x-op-moduleLayout 中才能显示）。
+ * 返回新的简历数据，不做原地修改。
+ */
+function withCustomModulesInLayout(data: JsonResume, template: string): JsonResume {
+  const customModules = data['x-op-customModules'] ?? [];
+  const ids = customModules.map((m) => m.id).filter(Boolean);
+  if (ids.length === 0) return data;
+
+  const cur = getEffectiveLayout(template, data['x-op-moduleLayout']);
+  const existing = new Set([...cur.sidebar, ...cur.main]);
+  const freshIds = ids.filter((id) => !existing.has(id));
+  // 模块化匹配：识别出「个人介绍/自我评价」内容但当前布局缺 aboutme → 以标准模块（标题+色条+内容）导入
+  const needAboutme = !!data['x-op-aboutmeHtml'] && !existing.has('aboutme');
+  if (freshIds.length === 0 && !needAboutme) return data;
+
+  return {
+    ...data,
+    'x-op-moduleLayout': {
+      ...(data['x-op-moduleLayout'] ?? {}),
+      [template]: { sidebar: [...cur.sidebar], main: [...cur.main, ...freshIds, ...(needAboutme ? ['aboutme'] : [])] },
+    },
+  };
+}
+
 export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
   const { t } = useTranslation();
   const update = useResumeStore((s) => s.update);
@@ -92,6 +121,7 @@ export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
   const activeProviderId = useAIStore((s) => s.activeProviderId);
   const getProviderConfig = useAIStore((s) => s.getProviderConfig);
   const customProviders = useAIStore((s) => s.customProviders);
+  const template = useUIStore((s) => s.template);
 
   const [state, setState] = useState<ImportStage>({ step: 'upload' });
   const [dragging, setDragging] = useState(false);
@@ -159,12 +189,14 @@ export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
     lastFileRef.current = file;
 
     try {
-      // 阶段 1：提取 PDF 文本（按行保留段落/标题结构）
+      // 阶段 1：提取 PDF 文本（按视觉行重建，双栏版式按阅读顺序重排）
       setState({ step: 'extracting' });
       // 最小展示时长仅用于避免进度步骤一闪而过；从 2.1s 降到 0.6s，
       // 消除无谓等待（老版本“识别时间久”的一部分来自这段人工延迟）
       const minDisplayDelay = new Promise((r) => setTimeout(r, 600));
-      const [pdfText] = await Promise.all([extractTextFromPDF(file), minDisplayDelay]);
+      const [pdfTextResult] = await Promise.all([extractTextFromPDF(file), minDisplayDelay]);
+      const pdfText = pdfTextResult.text;
+      const twoColumn = pdfTextResult.twoColumn;
       if (isStale()) return;
 
       // 阶段 2：调用 AI 解析（JSON 模式 + 结构校验-修复循环）
@@ -178,7 +210,7 @@ export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
       // 首轮消息：系统提示 + 简历文本
       const baseMessages = (): Array<{ role: 'system' | 'user'; content: string }> => [
         { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: buildUserPrompt(pdfText) },
+        { role: 'user', content: buildUserPrompt(pdfText, { twoColumn }) },
       ];
 
       // 2a. 首次调用：response_format=json_object 约束结构化输出
@@ -193,7 +225,7 @@ export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
       } catch (error) {
         parseError = error instanceof Error ? error.message : String(error);
       }
-      let issues = aiJson ? validateAIResumeJson(aiJson).issues : ['无法解析为 JSON 对象'];
+      let issues = aiJson ? validateAIResumeJson(aiJson, pdfText).issues : ['无法解析为 JSON 对象'];
       let repairRound = 0;
       while ((!aiJson || issues.length > 0 || !isValidAIResumeData(aiJson)) && repairRound < 2) {
         repairRound += 1;
@@ -218,7 +250,7 @@ export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
           aiJson = null;
           parseError = error instanceof Error ? error.message : String(error);
         }
-        issues = aiJson ? validateAIResumeJson(aiJson).issues : ['无法解析为 JSON 对象'];
+        issues = aiJson ? validateAIResumeJson(aiJson, pdfText).issues : ['无法解析为 JSON 对象'];
       }
       if (isStale()) return;
 
@@ -288,14 +320,15 @@ export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
     try {
       // 先清空旧数据，再写入新数据，确保完全替换而非合并
       reset();
-      update(state.data);
+      // AI 识别的自定义模块需要注册进当前模板布局才会渲染
+      update(withCustomModulesInLayout(state.data, template));
       await save();
       toast.success(t('importPDF.success'));
       performClose();
     } catch {
       toast.error(t('common.saveError'));
     }
-  }, [state, reset, update, save, performClose, t]);
+  }, [state, reset, update, save, performClose, t, template]);
 
   /** 重试：回到上传阶段 */
   const handleRetry = useCallback(() => {
@@ -539,6 +572,18 @@ export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
                         <span className="font-medium">{a.title}</span>
                         {a.date && <span className="ml-2 text-muted-foreground">{a.date}</span>}
                       </p>
+                    ))}
+                  </PreviewSection>
+
+                  {/* AI 识别出的非预设栏目（自定义模块） */}
+                  <PreviewSection
+                    icon={<Layers className="h-4 w-4" />}
+                    title={t('module.customModule')}
+                    count={state.data['x-op-customModules']?.length}
+                    visible={!!state.data['x-op-customModules']?.length}
+                  >
+                    {state.data['x-op-customModules']?.map((m) => (
+                      <p key={m.id} className="text-xs font-medium">{m.title}</p>
                     ))}
                   </PreviewSection>
                 </div>

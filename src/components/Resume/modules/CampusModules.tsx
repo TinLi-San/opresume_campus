@@ -129,11 +129,12 @@ function EducationRenderer({ config, itemRange, showTitle = true }: ModuleProps)
               <span className="campus-bold">{edu.institution}</span>
               <TimeRange startDate={edu.startDate} endDate={edu.endDate} />
             </div>
-            {(edu.area || edu.studyType) && (
+            {(edu.area || edu.studyType || edu.score) && (
               <div className="campus-item-sub">
                 {edu.area && <span>{edu.area}</span>}
                 {edu.area && edu.studyType && <span className="campus-nowrap"> - </span>}
                 {edu.studyType && <KaiLabel>{edu.studyType}</KaiLabel>}
+                {edu.score && <span className="campus-muted">（{edu.score}）</span>}
               </div>
             )}
           </div>
@@ -155,7 +156,6 @@ function CoursesRenderer({ config, itemRange, showTitle = true }: ModuleProps) {
   if (isHidden(config, 'campusCourses') || !all.length) return null;
 
   const list = itemRange ? all.slice(itemRange[0], itemRange[1]) : all;
-  const offset = itemRange ? itemRange[0] : 0;
 
   return (
     <EditableSection module="campusCourses">
@@ -163,12 +163,11 @@ function CoursesRenderer({ config, itemRange, showTitle = true }: ModuleProps) {
         {showTitle && (
           <CampusSectionTitle title={getTitle(config, 'campusCourses', t('module.campusCourses'))} icon={moduleIcon} />
         )}
-        {list.map((c, i) => (
-          <div key={c.id ?? i} className="campus-item campus-bullet" data-item-index={offset + i}>
-            <span className="campus-bullet-dot" aria-hidden="true">•</span>
-            <span className="campus-bullet-text">{c.text}</span>
-          </div>
-        ))}
+        {/* 一行多门：多门课程用顿号连接在单条中自然换行，避免每门独占一行造成大片留白 */}
+        <div className="campus-item campus-bullet">
+          <span className="campus-bullet-dot" aria-hidden="true">•</span>
+          <span className="campus-bullet-text">{list.map((c) => c.text).filter(Boolean).join('、')}</span>
+        </div>
       </section>
     </EditableSection>
   );
@@ -285,6 +284,7 @@ function SkillRenderer({ config, itemRange, showTitle = true }: ModuleProps) {
   const moduleIcon = useCampusModuleIcon('skillList');
   const all = (config.skills ?? []) as JsonSkill[];
   if (isHidden(config, 'skillList') || !all.length) return null;
+  const showLevel = config['x-op-showSkillLevel'] !== false;
 
   const list = itemRange ? all.slice(itemRange[0], itemRange[1]) : all;
   const offset = itemRange ? itemRange[0] : 0;
@@ -299,8 +299,17 @@ function SkillRenderer({ config, itemRange, showTitle = true }: ModuleProps) {
           <div key={skill['x-op-id'] ?? i} className="campus-item campus-bullet" data-item-index={offset + i}>
             <span className="campus-bullet-dot" aria-hidden="true">•</span>
             <span className="campus-bullet-text">
-              {skill.name}
-              {skill.level && <span className="campus-muted"> — {skill.level}</span>}
+              {skill.keywords?.length ? (
+                <>
+                  <span className="campus-bold">{skill.name}：</span>
+                  {skill.keywords.join('、')}
+                </>
+              ) : (
+                <>
+                  {skill.name}
+                  {showLevel && skill.level && <span className="campus-muted"> — {skill.level}</span>}
+                </>
+              )}
             </span>
           </div>
         ))}
@@ -334,6 +343,7 @@ function AwardRenderer({ config, itemRange, showTitle = true }: ModuleProps) {
             <span className="campus-bullet-dot" aria-hidden="true">•</span>
             <span className="campus-bullet-text">
               {award.title}
+              {award.awarder && <span className="campus-muted"> · {award.awarder}</span>}
               {award.date && <span className="campus-muted"> ({formatCampusDate(award.date)})</span>}
             </span>
           </div>

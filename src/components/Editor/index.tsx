@@ -404,6 +404,7 @@ function ModuleContent({
   config: JsonResume;
   update: (partial: Partial<JsonResume>) => void;
 }) {
+  const { t } = useTranslation();
   const rawData = (config as Record<string, unknown>)[schema.dataKey];
 
   // 所有 hooks 必须在条件分支之前调用，确保调用顺序一致
@@ -465,12 +466,32 @@ function ModuleContent({
 
   // 普通列表
   if (schema.isList) {
+    // 技能模块：「是否显示熟练度」开关（x-op-showSkillLevel，缺省跟随数据）
+    const isSkill = schema.module === 'skillList';
+    const showLevel = config['x-op-showSkillLevel'] !== false;
     return (
-      <ListEditor
-        schema={schema}
-        items={fullArray}
-        onChange={handleListChange}
-      />
+      <div className="space-y-3">
+        {isSkill && (
+          <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2">
+            <Label className="text-sm">{t('field.showSkillLevel')}</Label>
+            <span
+              role="button"
+              tabIndex={0}
+              className="inline-flex h-6 w-6 items-center justify-center rounded-md text-gray-400 hover:bg-accent hover:text-gray-600"
+              aria-label={t(showLevel ? 'common.hide' : 'common.show')}
+              onClick={() => update({ 'x-op-showSkillLevel': !showLevel } as Partial<JsonResume>)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') update({ 'x-op-showSkillLevel': !showLevel } as Partial<JsonResume>); }}
+            >
+              {showLevel ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+            </span>
+          </div>
+        )}
+        <ListEditor
+          schema={schema}
+          items={fullArray}
+          onChange={handleListChange}
+        />
+      </div>
     );
   }
 

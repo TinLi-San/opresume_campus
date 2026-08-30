@@ -29,7 +29,13 @@ export function AwardModule({ config, tokens, itemRange, showTitle = true }: Mod
               !tokens.layout.awardTimeInline && tokens.layout.flexAlign,
             )}
           >
-            <span>{award.title}</span>
+            <span>
+              {award.title}
+              {/* P1-11 修复：颁发机构（awarder）必须渲染；年份按原文保真不推断月份 */}
+              {award.awarder && (
+                <span className={cn('ml-1', tokens.colors.muted)}> · {award.awarder}</span>
+              )}
+            </span>
             {award.date && (
               tokens.layout.awardTimeInline
                 ? <span className={cn('ml-1', tokens.colors.muted)}>({award.date})</span>

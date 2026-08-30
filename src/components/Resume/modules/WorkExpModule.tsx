@@ -27,6 +27,12 @@ export function WorkExpModule({ config, tokens, itemRange, showTitle = true }: M
                 <p className={cn(tokens.typography.titleSize, tokens.typography.titleWeight, tokens.colors.primary)}>
                   {mask(work.name, 'companyName')}
                 </p>
+                {/* P1-8 修复：岗位名称必须渲染（导入端 position 已正确映射，此前渲染层丢失） */}
+                {work.position && (
+                  <p className={cn(tokens.typography.contentSize, tokens.typography.titleWeight, tokens.colors.secondary)}>
+                    {mask(work.position, 'position')}
+                  </p>
+                )}
                 {work['x-op-departmentName'] && (
                   <p className={cn(tokens.typography.contentSize, tokens.colors.secondary)}>
                     {mask(work['x-op-departmentName'], 'departmentName')}

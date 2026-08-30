@@ -13,7 +13,17 @@
 import assert from 'node:assert/strict';
 import { mapAIJsonToResume } from '../src/services/resume-mapper.ts';
 import { validateAIResumeJson } from '../src/services/resume-validate.ts';
-import { pageItemsToText, normalizeText, capTextForAI } from '../src/utils/pdf-text.ts';
+import {
+  pageItemsToText,
+  normalizeText,
+  capTextForAI,
+  cleanExtractedText,
+  stripPrivateUseGlyphs,
+  splitNumberedRuns,
+  pageItemsToStructuredLines,
+  sortLinesInReadingOrder,
+  structuredLinesToText,
+} from '../src/utils/pdf-text.ts';
 
 let passed = 0;
 let failed = 0;
@@ -173,6 +183,122 @@ test('超长文本保留头部与尾部', () => {
 test('normalizeText 折叠多余空行', () => {
   const t = normalizeText('  工作经历  \n\n\n\n  某公司  ');
   assert.equal(t, '工作经历\n\n某公司');
+});
+
+/* ---------------- 5. 修读课程：education.courses → x-op-courses ---------------- */
+
+test('教育经历 courses 汇总为 x-op-courses', () => {
+  const r = mapAIJsonToResume({
+    basics: { name: 'X' },
+    education: [
+      { institution: '东华大学', courses: ['机械设计', '材料力学', '机械制造技术基础'] },
+      { institution: '某校', courses: ['机械设计', '控制工程基础'] },
+    ],
+  });
+  const texts = (r['x-op-courses'] ?? []).map((c) => c.text);
+  assert.deepEqual(texts, ['机械设计', '材料力学', '机械制造技术基础', '控制工程基础']); // 去重保序
+  assert.equal(r.education![0].courses?.length, 3); // 标准字段保留
+});
+
+/* ---------------- 6. 自定义模块：customSections → x-op-customModules ---------------- */
+
+test('customSections 映射为自定义模块（标题 + 富文本内容）', () => {
+  const r = mapAIJsonToResume({
+    basics: { name: 'X' },
+    customSections: [
+      { title: '证书资质', items: ['CET-6', '计算机二级'] },
+      { title: '兴趣爱好', content: '阅读，跑步' },
+    ],
+  });
+  const mods = r['x-op-customModules']!;
+  assert.equal(mods.length, 2);
+  assert.equal(mods[0].title, '证书资质');
+  assert.ok(mods[0].id.startsWith('custom-'));
+  assert.ok(mods[0].contentHtml.includes('<li><p>CET-6</p></li>'));
+  assert.ok(mods[1].contentHtml.includes('阅读，跑步'));
+});
+
+test('customSections 支持 name 别名，无标题无内容条目被跳过', () => {
+  const r = mapAIJsonToResume({
+    basics: { name: 'X' },
+    customSections: [{ name: '校园活动', items: ['迎新志愿者'] }, {}],
+  });
+  assert.equal(r['x-op-customModules']?.length, 1);
+  assert.equal(r['x-op-customModules']![0].title, '校园活动');
+});
+
+/* ---------------- 7. 校验器：customSections 与修读课程内容级检查 ---------------- */
+
+test('校验器：customSections 结构错误被检出', () => {
+  const v = validateAIResumeJson({ basics: { name: 'X' }, customSections: 'not-array' });
+  assert.equal(v.ok, false);
+  assert.ok(v.issues.some((s) => s.includes('customSections')));
+});
+
+test('校验器：原文有修读课程但 education 无 courses → 提示修复', () => {
+  const source = '教育背景\n东华大学\n修读课程\n• 机械设计，材料力学';
+  const v = validateAIResumeJson(
+    { basics: { name: 'X' }, education: [{ institution: '东华大学' }] },
+    source,
+  );
+  assert.equal(v.ok, false);
+  assert.ok(v.issues.some((s) => s.includes('courses')));
+});
+
+test('校验器：education 有 courses 时通过内容级检查', () => {
+  const source = '教育背景\n东华大学\n修读课程\n• 机械设计';
+  const v = validateAIResumeJson(
+    { basics: { name: 'X' }, education: [{ institution: '东华大学', courses: ['机械设计'] }] },
+    source,
+  );
+  assert.equal(v.ok, true);
+});
+
+/* ---------------- 8. pdf-text：PUA 过滤 / 编号拆分 / 双栏阅读顺序 ---------------- */
+
+test('stripPrivateUseGlyphs 过滤图标私用区字符', () => {
+  assert.equal(stripPrivateUseGlyphs('王小明\uF0D5 22 岁 \uF004 XX 省'), '王小明 22 岁  XX 省');
+});
+
+test('splitNumberedRuns 拆分折行编号列表', () => {
+  assert.equal(
+    splitNumberedRuns('1. 整合市场调研； 2. 针对 xx 场景； 3. 协作组员'),
+    '1. 整合市场调研\n2. 针对 xx 场景\n3. 协作组员',
+  );
+  // 非列表行不拆分（普通句子的分号保留）
+  assert.equal(splitNumberedRuns('这是普通句子；2. 后面的内容不是编号'), '这是普通句子；2. 后面的内容不是编号');
+});
+
+test('splitNumberedRuns 支持子弹符前缀与跨物理行折行', () => {
+  // 行首 "- 1."（真实模板形态）与折行后落在续行的 "； 3." 都能拆
+  assert.equal(
+    splitNumberedRuns('- 1. 整合调研； 2. 方案研判\n能化程度低； 3. 周期规划'),
+    '- 1. 整合调研\n2. 方案研判\n能化程度低\n3. 周期规划',
+  );
+});
+
+test('cleanExtractedText 组合清理', () => {
+  const t = cleanExtractedText('1. 整合调研； 2. 方案研判\uF0D7\n\n  ');
+  assert.equal(t, '1. 整合调研\n2. 方案研判');
+});
+
+test('双栏版式按阅读顺序重排（先左栏后右栏）', () => {
+  // 页面宽 600；左栏 x≈40（两行），右栏 x≈340（两行），内容互为交错
+  const items = [
+    { str: '工作经历', transform: [1, 0, 0, 1, 40, 700] },
+    { str: '某公司', transform: [1, 0, 0, 1, 40, 660] },
+    { str: '张三', transform: [1, 0, 0, 1, 340, 720] },
+    { str: '联系方式', transform: [1, 0, 0, 1, 340, 680] },
+  ];
+  const lines = pageItemsToStructuredLines(items);
+  const ordered = sortLinesInReadingOrder(lines, 600);
+  assert.equal(ordered.count, 2);
+  const text = structuredLinesToText(ordered.lines, { column: ordered.column, count: ordered.count });
+  // 先左栏两行（[左] 工作经历 → [左] 某公司），再右栏两行（[右] 张三 → [右] 联系方式）
+  assert.equal(
+    text,
+    '[左] 工作经历\n[左] 某公司\n[右] 张三\n[右] 联系方式',
+  );
 });
 
 /* ---------------- 汇总 ---------------- */

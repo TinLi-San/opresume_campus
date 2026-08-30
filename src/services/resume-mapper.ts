@@ -11,7 +11,7 @@
  * - 补充 url / courses / summary 等字段透传。
  */
 
-import type { JsonResume } from '@/types/json-resume';
+import type { JsonResume, JsonSkill } from '@/types/json-resume';
 
 /**
  * 将 AI 返回的 JSON 映射为 JsonResume 格式
@@ -43,11 +43,24 @@ export function mapAIJsonToResume(aiJson: unknown): JsonResume {
   if (skills.length > 0) result.skills = skills;
   if (awards.length > 0) result.awards = awards;
 
-  // 自我评价存储为 HTML（兼容数组和字符串）
+  // 修读课程：各教育经历的 courses 汇总为模板消费的 x-op-courses（template7 渲染层只读该字段）
+  const allCourses = collectCourses(data.education);
+  if (allCourses.length > 0) {
+    result['x-op-courses'] = allCourses.map((text) => ({ id: generateId(), text }));
+  }
+
+  // 自我评价存储为 HTML（兼容数组和字符串；customSections 中的「个人介绍/自我评价」类栏目
+  // 并入此处避免与自定义模块重复，保证以标准模块样式（标题+色条+内容）渲染）
   const rawBasics = data.basics as Record<string, unknown> | undefined;
-  const aboutmeHtml = rawBasics ? toListHtml(rawBasics.summary) || toListHtml(rawBasics.about) || toListHtml(rawBasics.bio) : undefined;
+  const baseAboutmeHtml = rawBasics ? toListHtml(rawBasics.summary) || toListHtml(rawBasics.about) || toListHtml(rawBasics.bio) : undefined;
+  const { modules: customModules, aboutmeHtml } = extractCustomModules(data, baseAboutmeHtml ?? undefined);
   if (aboutmeHtml) {
     result['x-op-aboutmeHtml'] = aboutmeHtml;
+  }
+
+  // AI 识别出的非预设栏目 → x-op-customModules（自定义模块，含标题与富文本内容）
+  if (customModules.length > 0) {
+    result['x-op-customModules'] = customModules;
   }
 
   // 工作年限
@@ -355,71 +368,191 @@ function looksLikeSkillTag(name: string): boolean {
   return true;
 }
 
-function extractSkillList(raw: unknown): JsonResume['skills'] & object[] {
+function extractSkillList(raw: unknown): NonNullable<JsonResume['skills']> {
   if (!Array.isArray(raw)) return [];
 
   const items = raw.filter((item): item is Record<string, unknown> => !!item && typeof item === 'object');
+  const out: JsonSkill[] = [];
 
-  // 判断是否为"技能标签+熟练度"格式：
-  // 1. name 必须是简短标签（不超过 20 字符），不能是一句描述
-  // 2. level 必须是纯粹的熟练度词（不超过 10 字符），不能是一句话
-  const validItems = items.filter((item) => {
-    const name = asString(item.name) || asString(item.skillName);
+  for (const item of items) {
+    const name = asString(item.name) || asString(item.skillName) || asString(item.group) || asString(item.groupName);
+    if (!name || name.length > 40) continue;
+
+    // 形态 1：单条技能（name + 有效熟练度）——level 必须来自原文
     const level = asString(item.level);
-    if (!name) return false;
-    // name 太长说明是描述性文本，不是技能标签
-    if (name.length > 20) return false;
-    // level 必须存在且是简短的熟练度关键词
-    if (!level || level.length > 10) return false;
-    return isValidSkillLevel(level);
-  });
-
-  if (validItems.length === 0) {
-    // 纯标签罗列回退（如 "Java、Python、SQL"）：全部没有 level 时，
-    // 保留简短无标点的标签为技能项，避免“整段技能丢失”。
-    const tagItems = items.filter((item) => looksLikeSkillTag(asString(item.name) || asString(item.skillName)));
-    if (tagItems.length === 0) return [];
-    return tagItems.map((item) => {
-      const name = asString(item.name) || asString(item.skillName);
-      return {
+    if (level && isValidSkillLevel(level)) {
+      const normalizedLevel = normalizeSkillLevel(level);
+      out.push({
         name,
-        level: '熟练',
+        level: normalizedLevel,
         keywords: asStringArray(item.keywords),
         'x-op-id': generateId(),
-        'x-op-skillLevel': 50,
-      };
-    });
+        'x-op-skillLevel': skillLevelToNumber(normalizedLevel),
+      });
+      continue;
+    }
+
+    // 形态 2：技能分组（name=分组名 + keywords/items 标签数组，无 level）
+    const tagSource = Array.isArray(item.keywords) ? item.keywords : Array.isArray(item.items) ? item.items : null;
+    if (tagSource && tagSource.length > 0) {
+      const tags = tagSource
+        .map((k) =>
+          typeof k === 'string'
+            ? k.trim()
+            : k && typeof k === 'object' && !Array.isArray(k)
+              ? asString((k as Record<string, unknown>).name)
+              : '',
+        )
+        .filter((s) => s !== '');
+      if (tags.length > 0) {
+        out.push({ name, keywords: tags, 'x-op-id': generateId() });
+        continue;
+      }
+    }
+
+    // 形态 3：纯标签（无 level、无分组）——不注入任何熟练度，避免臆造
+    if (looksLikeSkillTag(name)) {
+      out.push({ name, 'x-op-id': generateId() });
+    }
   }
 
-  return validItems.map((item) => {
-    const level = asString(item.level);
-    const normalizedLevel = normalizeSkillLevel(level);
-    return {
-      name: asString(item.name) || asString(item.skillName),
-      level: normalizedLevel,
-      keywords: asStringArray(item.keywords),
-      'x-op-id': generateId(),
-      'x-op-skillLevel': skillLevelToNumber(normalizedLevel),
-    };
-  });
+  return out;
+}
+
+/**
+ * 奖项标题归一化键（用于去重）：去空白、去起始年份、去括号/限定语，
+ * 仅用于比较是否同源，不影响保留的原文 title。
+ */
+function normalizeAwardKey(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/^[（(]?\d{4}[年./-]?\d{0,2}[）)]?[-·—–]?/, '')
+    .replace(/[（(][^）)]*[）)]/g, '')
+    .replace(/[·—–,，、]+$/, '')
+    .trim();
+}
+
+/** 信息完整度评分：去重时保留 date/awarder 更齐全的条目 */
+function awardInfoScore(item: Record<string, unknown>): number {
+  let s = 0;
+  if (asString(item.rawDate)) s += 1;
+  if (asString(item.awarder)) s += 1;
+  if (asString(item.summary)) s += 0.5;
+  return s;
 }
 
 function extractAwardList(raw: unknown): JsonResume['awards'] & object[] {
   if (!Array.isArray(raw)) return [];
 
-  return raw
+  const normalized = raw
     .filter((item): item is Record<string, unknown> => !!item && typeof item === 'object')
-    .filter((item) => {
-      const title = asString(item.title) || asString(item.name) || asString(item.awardInfo);
-      return !!title;
-    })
     .map((item) => ({
       title: asString(item.title) || asString(item.name) || asString(item.awardInfo),
-      date: formatDate(item.date) || formatDate(item.awardTime) || undefined,
-      awarder: asString(item.awarder) || asString(item.issuer) || undefined,
-      summary: asString(item.summary) || undefined,
-      'x-op-id': generateId(),
-    }));
+      rawDate: asString(item.date) || asString(item.awardTime) || asString(item.year) || asString(item.time),
+      awarder: asString(item.awarder) || asString(item.issuer) || asString(item.organization),
+      summary: asString(item.summary),
+    }))
+    .filter((x) => x.title !== '');
+
+  // 内容级去重（P0-1）：title 归一后同源合并，保留信息最全的一条（含日期/颁发方优先）
+  const seen = new Map<string, Record<string, unknown>>();
+  for (const item of normalized) {
+    const key = normalizeAwardKey(item.title);
+    if (!key) continue;
+    const prev = seen.get(key);
+    if (!prev) {
+      seen.set(key, item);
+    } else if (awardInfoScore(item) > awardInfoScore(prev)) {
+      seen.set(key, item);
+    }
+  }
+
+  return [...seen.values()].map((item) => ({
+    title: item.title as string,
+    // 日期逐字照抄原文（只有年份就保留年份），禁止推断补全月份、禁止格式化丢弃
+    date: asString(item.rawDate) || undefined,
+    awarder: asString(item.awarder) || undefined,
+    summary: asString(item.summary) || undefined,
+    'x-op-id': generateId(),
+  }));
+}
+
+/**
+ * 汇总所有教育经历中的修读课程（去重、保持出现顺序）
+ */
+function collectCourses(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const item of raw) {
+    if (!item || typeof item !== 'object') continue;
+    const courses = (item as Record<string, unknown>).courses;
+    if (!Array.isArray(courses)) continue;
+    for (const c of courses) {
+      const s = asString(c);
+      if (s && !seen.has(s)) {
+        seen.add(s);
+        out.push(s);
+      }
+    }
+  }
+  return out;
+}
+
+/** 标题是否属于「自我评价/个人介绍」类栏目（并入 aboutme 而非自定义模块） */
+function isAboutLikeTitle(title: string): boolean {
+  return /个人介绍|自我介绍|自我评价|个人简介|个人宣言|关于我|个人概述|自我描述/.test(title);
+}
+
+/**
+ * 将 AI 识别出的「非预设栏目」（customSections/customModules）映射为自定义模块：
+ * - title：栏目名（支持 name 别名）
+ * - contentHtml：items/content 分条转为 <ul><li>，单条或连续段落转 <p>
+ * - 「个人介绍/自我评价」类栏目不生成自定义模块：基础 summary 缺失时并入 aboutmeHtml，
+ *   已有 summary 时整段丢弃，避免与自我评价模块重复渲染
+ * 跳过既无标题也无内容的条目。
+ */
+function extractCustomModules(
+  raw: unknown,
+  baseAboutmeHtml?: string,
+): { modules: NonNullable<JsonResume['x-op-customModules']>; aboutmeHtml?: string } {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return { modules: [], aboutmeHtml: baseAboutmeHtml };
+  }
+  const obj = raw as Record<string, unknown>;
+  const source = Array.isArray(obj.customSections)
+    ? obj.customSections
+    : Array.isArray(obj.customModules)
+      ? obj.customModules
+      : [];
+
+  const modules: NonNullable<JsonResume['x-op-customModules']> = [];
+  let aboutmeHtml = baseAboutmeHtml || undefined;
+
+  for (const item of source) {
+    if (!item || typeof item !== 'object') continue;
+    const entry = item as Record<string, unknown>;
+    const title = asString(entry.title) || asString(entry.name);
+    const html =
+      toListHtml(entry.items) ||
+      toListHtml(entry.content) ||
+      toListHtml(entry.description);
+    if (!title && !html) continue;
+
+    // 自我评价类栏目：不生成自定义模块，避免与 aboutme 重复
+    if (isAboutLikeTitle(title)) {
+      if (!aboutmeHtml && html) aboutmeHtml = html;
+      continue;
+    }
+
+    modules.push({
+      id: `custom-${generateId()}`,
+      title: title || '自定义模块',
+      contentHtml: html ?? '<p></p>',
+    });
+  }
+  return { modules, aboutmeHtml };
 }
 
 function normalizeSkillLevel(level: string): string {

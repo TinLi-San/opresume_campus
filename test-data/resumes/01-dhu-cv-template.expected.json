@@ -9,5 +9,6 @@
   },
   "counts": { "education": 1, "work": 1, "projects": 3, "skills": 0, "awards": 0 },
   "countTolerance": 1,
-  "notes": "东华大学模板原稿：技能为「分类描述」格式（语言习得/工业工程/文档办公/算法编程），按 prompt 规则 6 应省略 skills；地点仅 XX 省（无城市）。"
+  "educationCourses": ["机械设计", "材料力学", "机械制造技术基础", "机电一体化产品设计", "控制工程基础", "电子技术"],
+  "notes": "东华大学模板原稿：技能为「分类描述」格式（语言习得/工业工程/文档办公/算法编程），按 prompt 规则 9 应省略 skills；地点仅 XX 省（无城市）。修读课程应逐门保留到 education[0].courses，并由映射汇总进 x-op-courses。"
 }

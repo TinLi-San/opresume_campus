@@ -33,14 +33,30 @@ export function EducationModule({ config, tokens, itemRange, showTitle = true }:
               {isInline ? (
                 <span className={cn(tokens.typography.contentSize, tokens.colors.secondary)}>
                   {edu.area}{edu.studyType && ` · ${edu.studyType}`}
+                  {/* P1-9 修复：GPA/成绩以括号+熟练度样式展示 */}
+                  {edu.score && (
+                    <span className={cn('ml-1 text-xs', tokens.colors.muted)}>（{edu.score}）</span>
+                  )}
                 </span>
               ) : (
                 <p className={cn(tokens.typography.contentSize, tokens.colors.secondary)}>
                   {edu.area}{edu.studyType && ` · ${edu.studyType}`}
+                  {edu.score && (
+                    <span className={cn('ml-1 text-xs', tokens.colors.muted)}>（{edu.score}）</span>
+                  )}
                 </p>
               )}
             </div>
             <TimeRange startDate={edu.startDate} endDate={edu.endDate} />
+            {/* P1-12 修复：修读课程一行多门（顿号连接，自然换行），避免每门独占一行 */}
+            {Array.isArray(edu.courses) && edu.courses.length > 0 && (
+              <p className={cn('mt-0.5', tokens.typography.contentSize, tokens.colors.secondary)}>
+                <span className={cn(tokens.typography.titleWeight, tokens.colors.secondary)}>
+                  {t('field.courses')}：
+                </span>
+                {edu.courses.join('、')}
+              </p>
+            )}
           </div>
         ))}
       </section>

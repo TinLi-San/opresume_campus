@@ -175,6 +175,8 @@ export interface JsonResume extends JsonResumeBase {
   'x-op-birthday'?: string;
   'x-op-ageHidden'?: boolean;
   'x-op-showJobTitle'?: boolean;
+  /** 技能模块「是否显示熟练度」开关（false=隐藏全部熟练度标识/进度条；缺省=跟随数据） */
+  'x-op-showSkillLevel'?: boolean;
   'x-op-workExpYear'?: string;
   'x-op-customFields'?: Array<{ id?: string; key: string; value: string }>;
   'x-op-aboutmeHtml'?: string;

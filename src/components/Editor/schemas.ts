@@ -62,6 +62,7 @@ export const schemas: ModuleSchema[] = [
       { key: 'institution', labelKey: 'field.school', type: 'text' },
       { key: 'area', labelKey: 'field.major', type: 'text' },
       { key: 'studyType', labelKey: 'field.academicDegree', type: 'text' },
+      { key: 'score', labelKey: 'field.score', type: 'text' },
       { key: 'startDate', labelKey: 'field.eduTime', type: 'time-range', endKey: 'endDate', endFutureYears: 5 },
     ],
     defaultItem: () => ({ 'x-op-id': uid('edu'), institution: '', area: '', studyType: '', startDate: '', endDate: '' }),
@@ -108,6 +109,7 @@ export const schemas: ModuleSchema[] = [
     titleKey: 'name',
     fields: [
       { key: 'name', labelKey: 'field.skillName', type: 'text' },
+      { key: 'keywords', labelKey: 'field.skillTags', type: 'text', readTransform: (v) => (Array.isArray(v) ? v.join('、') : v ?? ''), writeTransform: (v) => (v ? String(v).split(/[、,，;；]/).map((x) => x.trim()).filter(Boolean) : []) },
       { key: 'x-op-skillLevel', labelKey: 'field.skillLevel', type: 'number' },
       { key: 'level', labelKey: 'field.skillDesc', type: 'text' },
     ],
