@@ -41,7 +41,7 @@ function SidebarSectionTitle({ title, icon }: { title: string; icon?: string }) 
 
 const tokens = defineTokens({
   components: { SectionTitle },
-  variants: { skill: 'tags', project: 'detailed', education: 'stacked' },
+  variants: { skill: 'list', project: 'detailed', education: 'stacked' },
   layout: { awardTimeInline: false, flexAlign: 'items-start' },
 });
 
@@ -101,8 +101,8 @@ const definition: TemplateDefinition = {
   id: 'template6',
   tags: ['twoColumn', 'singlePage'],
   defaultLayout: {
-    sidebar: ['skillList', 'educationList', 'awardList', 'achievementList'],
-    main: ['workExpList', 'projectList', 'workList', 'aboutme'],
+    sidebar: ['educationList', 'skillList', 'awardList', 'achievementList'],
+    main: ['workExpList', 'projectList', 'aboutme', 'workList'],
   },
   getTokens: () => tokens,
   getSidebarTokens: () => sidebarTokens,

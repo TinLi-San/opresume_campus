@@ -71,8 +71,8 @@ const definition: TemplateDefinition = {
   id: 'template1',
   tags: ['twoColumn', 'singlePage'],
   defaultLayout: {
-    sidebar: ['skillList', 'educationList', 'awardList', 'achievementList'],
-    main: ['workExpList', 'projectList', 'workList', 'aboutme'],
+    sidebar: ['educationList', 'skillList', 'awardList', 'achievementList'],
+    main: ['workExpList', 'projectList', 'aboutme', 'workList'],
   },
   getTokens: () => tokens,
   LayoutShell: Template1Shell,

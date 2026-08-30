@@ -30,7 +30,7 @@ export interface StyleTokens {
     SectionTitle: ComponentType<{ title: string; icon?: string }>;
   };
   variants: {
-    skill: 'bar' | 'list' | 'tags';
+    skill: 'bar' | 'list';
     project: 'compact' | 'detailed';
     education: 'inline' | 'stacked';
   };

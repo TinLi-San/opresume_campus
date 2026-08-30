@@ -351,10 +351,10 @@ div.resume-layout .resume-a4-tight a {
   /* 版式（页边距/模块间距/行高/字号）全部跟随编辑器「外观」里的全局排版设置：
      不在此处覆盖 --resume-* 变量（与其他模板一致），保证编辑区调整即时生效。 */
   color: var(--campus-ink);
-  font-size: min(var(--resume-body-size, 14px), 13px); /* 单页硬保证：正文上限 13px（紧凑单页版） */
-  /* 单页硬保证：行距上限按 DHU 原模板比例（10.9pt/14.6pt ≈ 1.34），
-     即使用户把全局行距调大，也压回紧凑比例 */
-  line-height: min(var(--resume-line-height, 1.5), 1.28);
+  /* 正文默认 14px：跟随编辑器「外观→正文字号」，上限 14px，保证单页 A4 不因用户拉大而溢出 */
+  font-size: min(var(--resume-body-size, 14px), 14px);
+  /* 行距默认 1.4（对照 DHU 源模板的可读比例），上限 1.4，调大全局行距时压回 */
+  line-height: min(var(--resume-line-height, 1.5), 1.4);
 }
 
 /* 楷体标注（描述：/主要工作：/学历） */
@@ -542,13 +542,14 @@ div.resume-layout .resume-a4-tight a {
   text-decoration: underline;
 }
 
-/* 模块间距（单轨 + 单页硬保证）：campus 下按结构契约（EditableSection 包装的
-   section/div 直接子层）统一取 --resume-module-gap，上限 18px——标准 24px / 宽 32px
-   都被收敛，即使编辑器里选「宽间距」也保持一页 A4。
+/* 模块间距（单轨）：campus 下按结构契约（EditableSection 包装的
+   section/div 直接子层）统一取 --resume-module-gap，使其与其它模板一致——
+   「标准/宽松」预设真实生效（不再被 18px 上限压平）。默认样例留有充足余量，
+   A4 单页安全性由正文/行距上限与条目级紧间距共同保障。
    不再依赖 tokens.spacing.module 那类每模板声明的 mb-* 遗产（已删除）。 */
 .campus-resume .resume-module > div > section,
 .campus-resume .resume-module > div > div {
-  margin-bottom: min(var(--resume-module-gap), 18px);
+  margin-bottom: var(--resume-module-gap);
 }
 
 .campus-resume .resume-module:last-child > div > section,

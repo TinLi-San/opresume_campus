@@ -84,7 +84,7 @@ export const useUIStore = create<UIStore>()(
       customFieldIconMap: {},
       showIcons: true,
       privacyMode: false,
-      layout: { pageMargin: 'standard', moduleGap: 'standard', titleFontSize: 16, bodyFontSize: 14, lineHeight: 1.5 },
+      layout: { pageMargin: 'standard', moduleGap: 'standard', titleFontSize: 16, bodyFontSize: 14, lineHeight: 1.4 },
       menuPanelOpen: false,
       editingProviderId: null,
       polishDialog: null,

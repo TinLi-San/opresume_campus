@@ -20,7 +20,7 @@ function SectionTitle({ title, icon }: { title: string; icon?: string }) {
 
 const tokens = defineTokens({
   components: { SectionTitle },
-  variants: { skill: 'tags', education: 'inline' },
+  variants: { skill: 'list', education: 'inline' },
   layout: { awardTimeInline: true, flexAlign: 'items-baseline' },
 });
 
@@ -73,7 +73,7 @@ const definition: TemplateDefinition = {
   tags: ['singleColumn', 'multiPage'],
   defaultLayout: {
     sidebar: [],
-    main: ['workExpList', 'projectList', 'skillList', 'educationList', 'awardList', 'achievementList', 'workList', 'aboutme'],
+    main: ['educationList', 'workExpList', 'projectList', 'skillList', 'awardList', 'aboutme', 'achievementList', 'workList'],
   },
   getTokens: () => tokens,
   LayoutShell: Template2Shell,

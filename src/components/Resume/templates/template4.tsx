@@ -98,7 +98,7 @@ const definition: TemplateDefinition = {
   tags: ['singleColumn', 'multiPage'],
   defaultLayout: {
     sidebar: [],
-    main: ['workExpList', 'projectList', 'skillList', 'educationList', 'awardList', 'achievementList', 'workList', 'aboutme'],
+    main: ['educationList', 'workExpList', 'projectList', 'skillList', 'awardList', 'aboutme', 'achievementList', 'workList'],
   },
   getTokens: () => tokens,
   LayoutShell: Template4Shell,

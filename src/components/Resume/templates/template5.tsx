@@ -76,7 +76,7 @@ const definition: TemplateDefinition = {
   tags: ['singleColumn', 'multiPage'],
   defaultLayout: {
     sidebar: [],
-    main: ['skillList', 'workExpList', 'projectList', 'educationList', 'awardList', 'achievementList', 'workList', 'aboutme'],
+    main: ['educationList', 'workExpList', 'projectList', 'skillList', 'awardList', 'aboutme', 'achievementList', 'workList'],
   },
   getTokens: () => tokens,
   LayoutShell: Template5Shell,

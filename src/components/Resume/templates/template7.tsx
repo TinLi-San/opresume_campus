@@ -396,8 +396,8 @@ const definition: TemplateDefinition = {
     main: [
       'educationList',
       'campusCourses',
-      'projectList',
       'workExpList',
+      'projectList',
       'skillList',
       'awardList',
       'aboutme',
