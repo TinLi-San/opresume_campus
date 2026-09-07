@@ -1,4 +1,4 @@
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import fs from 'fs/promises';
@@ -281,49 +281,83 @@ function editorRouteRewritePlugin(): Plugin {
   };
 }
 
-export default defineConfig({
-  plugins: [react(), resumeApiPlugin(), editorRouteRewritePlugin()],
-  define: {
-    __APP_VERSION__: JSON.stringify(pkg.version),
-  },
-  server: {
-    port: 5173,
-    strictPort: true,
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
+function clarityPlugin(id: string): Plugin {
+  return {
+    name: 'clarity-production-script',
+    apply: 'build',
+    configResolved() {
+      // 未配置 ID 时提示，避免部署后统计静默缺失
+      if (!id) {
+        console.warn('[clarity] 未配置 CLARITY_ID 环境变量，本次构建产物不包含统计脚本。');
+      }
     },
-  },
-  build: {
-    rollupOptions: {
-      // 多入口：landing（index.html，纯静态）与编辑器（editor.html，挂 React）。
-      // 让 landing 用户不必下载 React bundle，提升首屏与 SEO 表现。
-      input: {
-        main: path.resolve(__dirname, 'index.html'),
-        editor: path.resolve(__dirname, 'editor.html'),
+    transformIndexHtml() {
+      if (!id) return;
+
+      return [
+        {
+          tag: 'script',
+          injectTo: 'head-prepend',
+          children: `(function(c,l,a,r,i,t,y){
+  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window, document, "clarity", "script", "${id}");`,
+        },
+      ];
+    },
+  };
+}
+
+export default defineConfig(({ mode }) => {
+  // CLARITY_ID：Microsoft Clarity 项目 ID
+  // 未配置时构建产物不注入统计脚本
+  const { CLARITY_ID } = loadEnv(mode, __dirname, 'CLARITY_');
+
+  return {
+    plugins: [react(), resumeApiPlugin(), editorRouteRewritePlugin(), clarityPlugin(CLARITY_ID)],
+    define: {
+      __APP_VERSION__: JSON.stringify(pkg.version),
+    },
+    server: {
+      port: 5173,
+      strictPort: true,
+    },
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
       },
-      output: {
-        manualChunks: {
-          'vendor-tiptap': [
-            '@tiptap/react',
-            '@tiptap/starter-kit',
-            '@tiptap/extension-link',
-            '@tiptap/extension-placeholder',
-          ],
-          'vendor-dnd': ['@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
-          'vendor-i18n': ['i18next', 'react-i18next'],
-          'vendor-radix': [
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-select',
-            '@radix-ui/react-scroll-area',
-            '@radix-ui/react-slider',
-            '@radix-ui/react-tooltip',
-            '@radix-ui/react-alert-dialog',
-            '@radix-ui/react-collapsible',
-          ],
+    },
+    build: {
+      rollupOptions: {
+        // 多入口：landing（index.html，纯静态）与编辑器（editor.html，挂 React）。
+        // 让 landing 用户不必下载 React bundle，提升首屏与 SEO 表现。
+        input: {
+          main: path.resolve(__dirname, 'index.html'),
+          editor: path.resolve(__dirname, 'editor.html'),
+        },
+        output: {
+          manualChunks: {
+            'vendor-tiptap': [
+              '@tiptap/react',
+              '@tiptap/starter-kit',
+              '@tiptap/extension-link',
+              '@tiptap/extension-placeholder',
+            ],
+            'vendor-dnd': ['@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
+            'vendor-i18n': ['i18next', 'react-i18next'],
+            'vendor-radix': [
+              '@radix-ui/react-dialog',
+              '@radix-ui/react-select',
+              '@radix-ui/react-scroll-area',
+              '@radix-ui/react-slider',
+              '@radix-ui/react-tooltip',
+              '@radix-ui/react-alert-dialog',
+              '@radix-ui/react-collapsible',
+            ],
+          },
         },
       },
     },
-  },
+  };
 });
