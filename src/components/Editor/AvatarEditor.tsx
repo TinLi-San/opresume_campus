@@ -9,6 +9,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { Card } from '@/components/ui/card';
 import { useUIStore } from '@/store/ui';
+import { trackClarityEvent } from '@/utils/clarity';
 
 const MAX_SIZE = 2 * 1024 * 1024;
 const ACCEPTED_TYPES = new Set(['image/png', 'image/jpeg']);
@@ -68,6 +69,7 @@ export function AvatarEditor({ avatar, onChange }: AvatarEditorProps) {
             reader.readAsDataURL(file);
           });
           set({ src: dataUrl });
+          trackClarityEvent('resume_avatar_uploaded');
         } catch (e) {
           toast.error(e instanceof Error ? e.message : t('field.uploadFailed'));
         }
@@ -78,7 +80,10 @@ export function AvatarEditor({ avatar, onChange }: AvatarEditorProps) {
       try {
         const res = await fetch('/api/avatar', { method: 'POST', headers: { 'Content-Type': file.type }, body: file });
         const json = await res.json();
-        if (json.src) set({ src: `${json.src}?t=${Date.now()}` });
+        if (json.src) {
+          set({ src: `${json.src}?t=${Date.now()}` });
+          trackClarityEvent('resume_avatar_uploaded');
+        }
         else if (json.error) toast.error(json.error);
       } catch (e) {
         toast.error(e instanceof Error ? e.message : t('field.uploadFailed'));
@@ -178,7 +183,10 @@ export function AvatarEditor({ avatar, onChange }: AvatarEditorProps) {
               <button
                 type="button"
                 className="inline-flex items-center gap-1 text-[11px] text-slate-400 transition-colors hover:text-red-500"
-                onClick={() => set({ src: undefined })}
+                onClick={() => {
+                  set({ src: undefined });
+                  trackClarityEvent('resume_avatar_deleted');
+                }}
               >
                 <Trash2 className="h-3 w-3" />
                 {t('field.removeAvatar')}

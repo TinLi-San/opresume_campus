@@ -13,6 +13,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { AppearanceDrawer } from './AppearanceDrawer';
+import { trackClarityEvent } from '@/utils/clarity';
 
 const IS_MAC = /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 const SHORTCUT = IS_MAC ? '⌘S' : 'Ctrl+S';
@@ -29,6 +30,7 @@ export function FloatingToolbar() {
   const handlePrint = useCallback(() => {
     if (printingRef.current) return;
     printingRef.current = true;
+    trackClarityEvent('resume_pdf_export_started');
 
     const callback = () => {
       window.print();
@@ -157,7 +159,7 @@ export function FloatingToolbar() {
               className="rounded-xl text-muted-foreground hover:text-foreground"
               asChild
             >
-              <a href="https://github.com/oopooa/opresume" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+              <a href="https://github.com/oopooa/opresume" target="_blank" rel="noopener noreferrer" aria-label="GitHub" onClick={() => trackClarityEvent('github_editor_toolbar_clicked')}>
                 <Github className="h-4 w-4" />
               </a>
             </Button>

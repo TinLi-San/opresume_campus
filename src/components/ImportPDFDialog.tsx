@@ -45,6 +45,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { trackClarityEvent } from '@/utils/clarity';
 
 interface ImportPDFDialogProps {
   open: boolean;
@@ -129,20 +130,24 @@ export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
 
   /** 核心解析流程 */
   const processFile = useCallback(async (file: File) => {
+    trackClarityEvent('resume_pdf_import_started');
     // 检查 AI 配置
     if (!activeProviderId) {
+      trackClarityEvent('resume_pdf_import_failed');
       setState({ step: 'error', message: t('importPDF.errorNoAI'), recoverable: false });
       return;
     }
 
     const providerConfig = getProviderConfig(activeProviderId);
     if (!providerConfig.apiKey || !providerConfig.verified) {
+      trackClarityEvent('resume_pdf_import_failed');
       setState({ step: 'error', message: t('importPDF.errorNoAI'), recoverable: false });
       return;
     }
 
     const preset = AI_PROVIDER_PRESETS[activeProviderId];
     if (!preset) {
+      trackClarityEvent('resume_pdf_import_failed');
       setState({ step: 'error', message: t('importPDF.errorNoAI'), recoverable: false });
       return;
     }
@@ -190,6 +195,7 @@ export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
       setState({ step: 'preview', data: resume });
     } catch (error) {
       if (isStale()) return;
+      trackClarityEvent('resume_pdf_import_failed');
       const message = error instanceof Error ? error.message : t('importPDF.errorUnknown');
       const isCors = message.includes('CORS');
       setState({
@@ -246,6 +252,7 @@ export function ImportPDFDialog({ open, onOpenChange }: ImportPDFDialogProps) {
       update(state.data);
       await save();
       toast.success(t('importPDF.success'));
+      trackClarityEvent('resume_pdf_imported');
       performClose();
     } catch {
       toast.error(t('common.saveError'));

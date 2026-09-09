@@ -34,6 +34,7 @@ import { Badge } from '@/components/ui/badge';
 import { ImportPDFDialog } from '@/components/ImportPDFDialog';
 import { LangSwitcher } from './LangSwitcher';
 import { BrandLogo } from '@/components/BrandLogo';
+import { trackClarityEvent } from '@/utils/clarity';
 
 export { FloatingToolbar } from './FloatingToolbar';
 
@@ -84,6 +85,7 @@ export function Toolbar() {
     const title = config.basics?.label || '';
     const filename = [name, title].filter(Boolean).join('-') || 'resume';
     exportResume(config, `${filename}.json`);
+    trackClarityEvent('resume_json_exported');
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,6 +101,7 @@ export function Toolbar() {
     try {
       await save();
       toast.success(t('toolbar.clearSuccess'));
+      trackClarityEvent('resume_data_cleared');
     } catch {
       toast.error(t('common.saveError'));
     }
@@ -114,6 +117,7 @@ export function Toolbar() {
       if (typeof template === 'string' && template) setTemplate(template);
       await save();
       toast.success(t('toolbar.importSuccess'));
+      trackClarityEvent('resume_json_imported');
     } catch (error) {
       toast.error(
         error instanceof ResumeImportError && error.code === 'invalid-format'
@@ -167,7 +171,12 @@ export function Toolbar() {
                 <TooltipTrigger asChild>
                   <button
                     type="button"
-                    onClick={togglePrivacy}
+                    onClick={() => {
+                      togglePrivacy();
+                      trackClarityEvent(
+                        privacyMode ? 'editor_privacy_mode_disabled' : 'editor_privacy_mode_enabled',
+                      );
+                    }}
                     className={cn(
                       'inline-flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs font-medium transition-colors',
                       privacyMode

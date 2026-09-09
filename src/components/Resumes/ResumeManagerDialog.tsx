@@ -46,6 +46,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { trackClarityEvent } from '@/utils/clarity';
 
 interface ResumeManagerDialogProps {
   open: boolean;
@@ -134,6 +135,7 @@ export function ResumeManagerDialog({ open, onOpenChange }: ResumeManagerDialogP
     if (busy || meta.id === activeId) return;
     try {
       await switchResume(meta.id);
+      trackClarityEvent('resume_manager_resume_switched');
       onOpenChange(false);
       toast.success(t('resumeManager.switchSuccess', { name: meta.name }));
     } catch {
@@ -153,6 +155,7 @@ export function ResumeManagerDialog({ open, onOpenChange }: ResumeManagerDialogP
   const handleCreate = async () => {
     try {
       await createResume();
+      trackClarityEvent('resume_manager_resume_created');
       onOpenChange(false);
       toast.success(t('resumeManager.createSuccess'));
     } catch {
@@ -163,6 +166,7 @@ export function ResumeManagerDialog({ open, onOpenChange }: ResumeManagerDialogP
   const handleDuplicate = async (meta: ResumeMeta) => {
     try {
       await duplicateResume(meta.id);
+      trackClarityEvent('resume_manager_resume_duplicated');
       toast.success(t('resumeManager.duplicateSuccess'));
     } catch {
       toast.error(t('resumeManager.operationFailed'));
@@ -180,6 +184,7 @@ export function ResumeManagerDialog({ open, onOpenChange }: ResumeManagerDialogP
     if (!id) return;
     try {
       await renameResume(id, renameValue);
+      trackClarityEvent('resume_manager_resume_renamed');
     } catch {
       toast.error(t('resumeManager.operationFailed'));
     }
@@ -189,6 +194,7 @@ export function ResumeManagerDialog({ open, onOpenChange }: ResumeManagerDialogP
     if (!deletingMeta) return;
     try {
       await deleteResume(deletingMeta.id);
+      trackClarityEvent('resume_manager_resume_deleted');
       toast.success(t('resumeManager.deleteSuccess'));
     } catch {
       toast.error(t('resumeManager.operationFailed'));

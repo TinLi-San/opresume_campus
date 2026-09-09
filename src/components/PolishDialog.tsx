@@ -16,6 +16,7 @@ import { useResumeStore } from '@/store/resume';
 import { polishHtmlStream, type PolishOperation, type PolishResult } from '@/services/ai-polish';
 import { extractText, countWords, applyInlineDiff } from '@/utils/text-diff';
 import { getPolishHandler } from '@/components/Resume/polish-handlers';
+import { trackClarityEvent } from '@/utils/clarity';
 
 // ─── 模块级常量 ────────────────────────────────────────────────────────────────
 
@@ -399,6 +400,7 @@ export function PolishDialog() {
       abortRef.current = controller;
       const id = ++requestIdRef.current;
       setLastOperation(op);
+      trackClarityEvent(`ai_polish_started_${op}`);
       setPhase('loading');
       setResult(null);
       setErrorMsg('');
@@ -436,11 +438,13 @@ export function PolishDialog() {
           setShowDiff(false); // 有改动时默认显示预览状态
         }
         setPhase('result');
+        trackClarityEvent(`ai_polish_succeeded_${op}`);
       } catch (err) {
         if (id !== requestIdRef.current) return;
         if (err instanceof DOMException && err.name === 'AbortError') return;
         setErrorMsg(err instanceof Error ? err.message : t('editor.polish.errorFailed'));
         setPhase('error');
+        trackClarityEvent(`ai_polish_failed_${op}`);
       }
     },
     [polishDialog, t, startStreamAnim, stopStreamAnim],
@@ -479,6 +483,7 @@ export function PolishDialog() {
       return;
     }
     toast.success(t('editor.polish.accepted'));
+    trackClarityEvent('ai_polish_applied');
     handleClose();
   }, [polishDialog, result, hasChanges, t, handleClose]);
 

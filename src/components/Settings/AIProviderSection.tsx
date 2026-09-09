@@ -10,6 +10,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { ProviderCard } from './ProviderCard';
 import { ProviderConfigDialog } from './ProviderConfigDialog';
 import type { AIProviderId } from '@/types';
+import { trackClarityEvent } from '@/utils/clarity';
 
 export function AIProviderSection() {
   const { t } = useTranslation();
@@ -26,6 +27,7 @@ export function AIProviderSection() {
 
   const handleCardClick = (providerId: AIProviderId) => {
     openProviderConfig(providerId);
+    trackClarityEvent(`ai_provider_config_opened_${providerId}`);
   };
 
   return (

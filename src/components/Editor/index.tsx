@@ -66,6 +66,7 @@ import { DEFAULT_MODULE_ICONS, DEFAULT_CUSTOM_MODULE_ICON } from '@/config/icons
 import { isCustomModule } from '@/components/Resume/modules';
 import { IconPicker } from './IconPicker';
 import { DynamicIcon } from '@/components/DynamicIcon';
+import { trackClarityEvent } from '@/utils/clarity';
 
 const ALWAYS_VISIBLE = new Set(['profile']);
 const BASICS_KEYS = new Set(['name', 'label', 'phone', 'email']);
@@ -712,7 +713,11 @@ export function Editor() {
     (module: string) => {
       if (!config) return;
       const prev = config['x-op-moduleHidden'] ?? {};
-      update({ 'x-op-moduleHidden': { ...prev, [module]: !prev[module] } } as Partial<JsonResume>);
+      const hidden = !prev[module];
+      update({ 'x-op-moduleHidden': { ...prev, [module]: hidden } } as Partial<JsonResume>);
+      const eventModule = (isCustomModule(module) ? 'custom' : module)
+        .replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+      trackClarityEvent(`resume_module_${hidden ? 'hidden' : 'shown'}_${eventModule}`);
     },
     [config, update],
   );
@@ -796,11 +801,14 @@ export function Editor() {
     (_event: DragEndEvent) => {
       setActiveId(null);
       if (tempLayout) {
+        const changed = tempLayout.sidebar.join('|') !== layout.sidebar.join('|')
+          || tempLayout.main.join('|') !== layout.main.join('|');
         saveLayout(tempLayout);
+        if (changed) trackClarityEvent('resume_module_reordered');
         setTempLayout(null);
       }
     },
-    [tempLayout, saveLayout],
+    [tempLayout, layout, saveLayout],
   );
 
   const handleDragCancel = useCallback(() => {
@@ -825,6 +833,7 @@ export function Editor() {
       'x-op-customModules': [...modules, newModule],
       'x-op-moduleLayout': { ...prevLayoutMap, [template]: newLayout },
     } as Partial<JsonResume>);
+    trackClarityEvent('resume_custom_module_added');
 
     /* 自动展开新模块 */
     setExpanded(id);
@@ -857,6 +866,7 @@ export function Editor() {
         'x-op-titleNameMap': titleMap,
         'x-op-moduleHidden': hiddenMap,
       });
+      trackClarityEvent('resume_custom_module_deleted');
 
       if (expanded === moduleId) setExpanded(null);
     },

@@ -20,6 +20,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { setClarityTag, trackClarityEvent } from '@/utils/clarity';
 
 interface ProviderConfigDialogProps {
   providerId: AIProviderId | null;
@@ -121,6 +122,7 @@ export function ProviderConfigDialog({
     if (result.success) {
       setVerifyState('success');
       setProviderVerified(providerId, true);
+      trackClarityEvent(`ai_provider_verify_succeeded_${providerId}`);
       toast.success(t('settings.verifySuccess'));
 
       if (result.availableModelIds) {
@@ -137,6 +139,7 @@ export function ProviderConfigDialog({
       }
     } else {
       setVerifyState('error');
+      trackClarityEvent(`ai_provider_verify_failed_${providerId}`);
       const i18nKey = result.errorCode ? VERIFY_ERROR_I18N[result.errorCode] : 'settings.verifyFailed';
       toast.error(t(i18nKey));
       setProviderVerified(providerId, false);
@@ -171,6 +174,11 @@ export function ProviderConfigDialog({
       selectedModel,
     });
     setActiveProvider(providerId);
+    setClarityTag('ai_provider', providerId);
+    setClarityTag('ai_model', selectedModel);
+    const modelKey = selectedModel.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '').toLowerCase();
+    trackClarityEvent(`ai_model_selected_${providerId}_${modelKey}`);
+    trackClarityEvent(`ai_provider_config_saved_${providerId}`);
     onOpenChange(false);
   }, [providerId, apiKey, apiUrl, selectedModel, updateProviderConfig, setActiveProvider, onOpenChange]);
 

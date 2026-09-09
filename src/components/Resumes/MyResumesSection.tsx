@@ -5,6 +5,7 @@ import { isDemoMode } from '@/i18n';
 import { useResumeLibraryStore } from '@/store/resume-library';
 import { Badge } from '@/components/ui/badge';
 import { ResumeManagerDialog } from './ResumeManagerDialog';
+import { trackClarityEvent } from '@/utils/clarity';
 
 /** 侧边栏一级菜单「我的简历」：点击打开简历管理面板 */
 export function MyResumesSection() {
@@ -32,7 +33,10 @@ export function MyResumesSection() {
     <>
       <button
         type="button"
-        onClick={() => setDialogOpen(true)}
+        onClick={() => {
+          setDialogOpen(true);
+          trackClarityEvent('resume_manager_opened');
+        }}
         className="group relative z-10 flex w-full items-center justify-between py-2"
       >
         <div className="flex shrink-0 items-center gap-2">

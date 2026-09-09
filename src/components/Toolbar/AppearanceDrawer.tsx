@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Palette, Check, ArrowRightLeft, Minus, Plus } from 'lucide-react';
 import { LayoutGroup, motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { setClarityTag, trackClarityEvent } from '@/utils/clarity';
 import { useUIStore } from '@/store/ui';
 import { useResumeStore } from '@/store/resume';
 import { getSampleResume } from '@/config/sample-resume';
@@ -155,6 +156,14 @@ export function AppearanceDrawer() {
   const setBodyFontSize = useUIStore((s) => s.setBodyFontSize);
   const setLineHeight = useUIStore((s) => s.setLineHeight);
 
+  // Mark the template currently used by this editor session so Clarity can
+  // compare sessions by template, including sessions that never open the picker.
+  useEffect(() => {
+    if (template) setClarityTag('template', template);
+    const activeTheme = PRESETS.find((preset) => preset.color === theme.color);
+    if (activeTheme) setClarityTag('theme_color', activeTheme.key);
+  }, [template, theme.color]);
+
   // drawer 动画完成后才启用缩略图 hover 效果，避免鼠标滑过时误触
   const [drawerReady, setDrawerReady] = useState(false);
   const readyTimer = useRef<ReturnType<typeof setTimeout>>();
@@ -174,6 +183,7 @@ export function AppearanceDrawer() {
 
   const handleTemplateSelect = useCallback((key: string) => {
     setTemplate(key);
+    trackClarityEvent(`template_selected_${key}`);
     // 模板随简历保存：写入当前简历数据（标记未保存，随保存持久化）
     useResumeStore.getState().update({ 'x-op-template': key });
     clearTimeout(closeTimer.current);
@@ -270,7 +280,12 @@ export function AppearanceDrawer() {
                         key={preset.key}
                         type="button"
                         aria-label={t(`theme.${preset.key}`)}
-                        onClick={() => updateTheme({ color: preset.color, tagColor: preset.tagColor })}
+                        onClick={() => {
+                          if (active) return;
+                          updateTheme({ color: preset.color, tagColor: preset.tagColor });
+                          const eventKey = preset.key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+                          trackClarityEvent(`theme_color_selected_${eventKey}`);
+                        }}
                         className="h-7 w-7 shrink-0 rounded-full transition-shadow"
                         style={{
                           backgroundColor: preset.color,

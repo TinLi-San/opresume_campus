@@ -3,6 +3,7 @@ import i18n from '@/i18n';
 import type { JsonResume } from '@/types/json-resume';
 import { loadResume, saveResume } from '@/services/resume';
 import { useUIStore } from '@/store/ui';
+import { trackClarityEvent } from '@/utils/clarity';
 
 function createEmptyResume(): JsonResume {
   return { basics: { name: '' } };
@@ -72,9 +73,11 @@ export const useResumeStore = create<ResumeStore>((set, get) => ({
     try {
       await saveResume(config);
       set({ dirty: false, saveError: null });
+      trackClarityEvent('resume_save_succeeded');
     } catch (e) {
       const msg = e instanceof Error ? e.message : i18n.t('common.saveError');
       set({ saveError: msg });
+      trackClarityEvent('resume_save_failed');
       throw e;
     }
   },
