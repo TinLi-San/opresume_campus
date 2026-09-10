@@ -10,6 +10,7 @@ import { MenuPanel } from '@/components/MenuPanel';
 import { Toaster } from '@/components/ui/sonner';
 import { PolishSelectionOverlay } from '@/components/PolishSelectionOverlay';
 import { PolishDialog } from '@/components/PolishDialog';
+import { StarPromptCard } from '@/components/StarPromptCard';
 import { Menu } from 'lucide-react';
 import {
   Tooltip,
@@ -104,6 +105,7 @@ function App() {
           <PolishDialog />
         </div>
         <MenuPanel />
+        <StarPromptCard />
         <Toaster />
         <DevAgentation />
       </div>

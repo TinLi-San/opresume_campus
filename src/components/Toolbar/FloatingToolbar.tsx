@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/tooltip';
 import { AppearanceDrawer } from './AppearanceDrawer';
 import { trackClarityEvent } from '@/utils/clarity';
+import { scheduleStarPrompt, markStarPromptClicked } from '@/utils/star-prompt';
 
 const IS_MAC = /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 const SHORTCUT = IS_MAC ? '⌘S' : 'Ctrl+S';
@@ -35,6 +36,8 @@ export function FloatingToolbar() {
     const callback = () => {
       window.print();
       printingRef.current = false;
+      // 打印对话框关闭（导出流程结束）后延迟数秒再弹 Star 提示，避免打断当下操作
+      scheduleStarPrompt();
     };
 
     // Safari 不支持 requestIdleCallback，降级为 setTimeout
@@ -159,7 +162,16 @@ export function FloatingToolbar() {
               className="rounded-xl text-muted-foreground hover:text-foreground"
               asChild
             >
-              <a href="https://github.com/oopooa/opresume" target="_blank" rel="noopener noreferrer" aria-label="GitHub" onClick={() => trackClarityEvent('github_editor_toolbar_clicked')}>
+              <a
+                href="https://github.com/oopooa/opresume"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub"
+                onClick={() => {
+                  markStarPromptClicked();
+                  trackClarityEvent('github_editor_toolbar_clicked');
+                }}
+              >
                 <Github className="h-4 w-4" />
               </a>
             </Button>

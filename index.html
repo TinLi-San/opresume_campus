@@ -731,7 +731,7 @@
         <a class="github-star-btn"
            href="https://github.com/oopooa/opresume"
            target="_blank" rel="noopener"
-           onclick="trackClarityEvent('github_header_clicked')"
+           onclick="trackClarityEvent('github_header_clicked'); markStarPromptClicked()"
            aria-label="Star OpResume on GitHub">
           <!-- 五角星 outline；hover 时由 CSS 控制 fill 与 rotate -->
           <svg class="github-star-btn__icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -1030,6 +1030,18 @@
 
     function trackClarityEvent(eventName) {
       if (typeof window.clarity === 'function') window.clarity('event', eventName);
+    }
+
+    // 记录用户主动访问过仓库（与编辑器 star-prompt.ts 共用同一 localStorage 键）：
+    // 编辑器导出 PDF 后的 Star 提示卡片检测到此标记即不再弹出。
+    function markStarPromptClicked() {
+      try {
+        localStorage.setItem('opresume:star-prompt', JSON.stringify({
+          status: 'clicked',
+          shownCount: 0,
+          lastShownAt: Date.now(),
+        }));
+      } catch (e) { /* localStorage 不可用时忽略 */ }
     }
 
     // 拉取 GitHub star 数：1 小时 localStorage 缓存，避开未授权 API 60 次/小时/IP 限制；

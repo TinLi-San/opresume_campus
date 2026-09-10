@@ -100,6 +100,12 @@
     "clearConfirm": "确认清空",
     "clearSuccess": "数据已清空"
   },
+  "starPrompt": {
+    "title": "觉得好用吗？",
+    "desc": "如果优派简历帮到了你，欢迎到 GitHub 点个 Star，你的支持是项目持续更新的动力～",
+    "cta": "Star 支持一下",
+    "later": "稍后再说"
+  },
   "module": {
     "profile": "基本信息",
     "educationList": "教育经历",

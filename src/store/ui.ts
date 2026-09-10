@@ -26,6 +26,8 @@ interface UIStore {
   menuPanelOpen: boolean;
   /** 当前正在配置的供应商 ID（Dialog 打开时） */
   editingProviderId: AIProviderId | null;
+  /** 「Star 支持」提示卡片开关（不持久化，由里程碑事件延迟调度） */
+  starPromptOpen: boolean;
   /** 页面级润色对话框状态 */
   polishDialog: {
     module: string;
@@ -69,6 +71,8 @@ interface UIStore {
   closeMenuPanel: () => void;
   openProviderConfig: (providerId: AIProviderId) => void;
   closeProviderConfig: () => void;
+  openStarPrompt: () => void;
+  closeStarPrompt: () => void;
 }
 
 export const useUIStore = create<UIStore>()(
@@ -87,6 +91,7 @@ export const useUIStore = create<UIStore>()(
       layout: { pageMargin: 'standard', moduleGap: 'standard', titleFontSize: 16, bodyFontSize: 14, lineHeight: 1.5 },
       menuPanelOpen: false,
       editingProviderId: null,
+      starPromptOpen: false,
       polishDialog: null,
 
       openPolishDialog: (entry) => set({ polishDialog: entry }),
@@ -152,6 +157,8 @@ export const useUIStore = create<UIStore>()(
       closeMenuPanel: () => set({ menuPanelOpen: false }),
       openProviderConfig: (providerId) => set({ editingProviderId: providerId }),
       closeProviderConfig: () => set({ editingProviderId: null }),
+      openStarPrompt: () => set({ starPromptOpen: true }),
+      closeStarPrompt: () => set({ starPromptOpen: false }),
     }),
     {
       name: 'opresume_ui',

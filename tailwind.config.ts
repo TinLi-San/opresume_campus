@@ -1,4 +1,6 @@
-/** @type {import('tailwindcss').Config} */
+import type { Config } from 'tailwindcss';
+import tailwindcssAnimate from 'tailwindcss-animate';
+
 export default {
   darkMode: ['class'],
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
@@ -18,10 +20,19 @@ export default {
           from: { height: 'var(--radix-collapsible-content-height)', opacity: '1' },
           to: { height: '0', opacity: '0' },
         },
+        // 极光漂移
+        'aurora-drift': {
+          '0%': { transform: 'translate3d(-12%, -6%, 0)' },
+          '25%': { transform: 'translate3d(6%, -12%, 0)' },
+          '50%': { transform: 'translate3d(12%, 6%, 0)' },
+          '75%': { transform: 'translate3d(-6%, 12%, 0)' },
+          '100%': { transform: 'translate3d(-12%, -6%, 0)' },
+        },
       },
       animation: {
         'collapsible-down': 'collapsible-down 200ms ease-out',
         'collapsible-up': 'collapsible-up 150ms ease-in forwards',
+        aurora: 'aurora-drift 18s ease-in-out infinite',
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -77,5 +88,5 @@ export default {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
-};
+  plugins: [tailwindcssAnimate],
+} satisfies Config;

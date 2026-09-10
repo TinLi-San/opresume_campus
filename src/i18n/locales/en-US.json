@@ -100,6 +100,12 @@
     "clearConfirm": "Confirm Clear",
     "clearSuccess": "Data cleared"
   },
+  "starPrompt": {
+    "title": "Enjoying OpResume?",
+    "desc": "If OpResume helped you, a star on GitHub would mean a lot and keeps the project going.",
+    "cta": "Star on GitHub",
+    "later": "Maybe later"
+  },
   "module": {
     "profile": "Profile",
     "educationList": "Education",
