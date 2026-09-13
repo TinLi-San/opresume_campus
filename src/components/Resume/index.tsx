@@ -25,6 +25,10 @@ function TemplateRenderer({ def, config }: { def: TemplateDefinition; config: Js
 /* ---------- 判断模板是否支持分页 ---------- */
 
 function supportsPagination(def: TemplateDefinition, config: JsonResume): boolean {
+  // 模板显式声明为固定单页版式（如校园应届生 A4 一页模板）→ 不分页。
+  // 注意：不复用 tags 里的 'singlePage' 展示标签——template1/6 也带该标签，
+  // 那样会让它们在用户清空侧栏后静默停止分页，等于改动既有模板行为。
+  if (def.singlePage) return false;
   const layout = getEffectiveLayout(def.id, config['x-op-moduleLayout']);
   // 双栏模板（sidebar 有模块）不分页
   return layout.sidebar.length === 0;
@@ -121,7 +125,7 @@ function PaginatedResumeView({ def, config }: { def: TemplateDefinition; config:
       {pages && pages.length > 0 ? (
         <div ref={pagesRef} className="flex flex-col items-center gap-8 print:gap-0">
           {pages.map((page, i) => {
-            const mainContent = renderPageSlices(page.slices, config, tokens);
+            const mainContent = renderPageSlices(page.slices, config, tokens, def.id);
             return (
               <div key={i} data-page-index={i} className="resume-page h-[297mm] w-[210mm] overflow-hidden">
                 <div className="resume-layout">

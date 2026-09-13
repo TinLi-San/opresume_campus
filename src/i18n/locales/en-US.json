@@ -5,6 +5,8 @@
   },
   "common": {
     "loading": "Loading...",
+    "listSeparator": ", ",
+    "labelSeparator": ": ",
     "loadError": "Failed to load resume data",
     "saveError": "Failed to save",
     "retry": "Retry",
@@ -54,6 +56,9 @@
   },
   "toolbar": {
     "template": "Template",
+    "campusAccentSource": "Accent color source",
+    "campusAccentLogo": "From school logo",
+    "campusAccentTheme": "From theme",
     "templateDesc": "Choose a template that suits your resume",
     "theme": "Theme",
     "language": "Language",
@@ -135,6 +140,15 @@
     "customFieldKey": "Field Name",
     "customFieldValue": "Field Value",
     "avatar": "Avatar",
+    "schoolLogo": "School Logo",
+    "uploadSchoolLogo": "Upload logo",
+    "changeSchoolLogo": "Change logo",
+    "removeSchoolLogo": "Remove logo",
+    "schoolLogoHint": "Shown at the top-left of the campus template. The template's built-in default logo is used until you upload your own.",
+    "schoolLogoHiddenHint": "Currently hidden — the logo is not shown in the resume.",
+    "schoolLogoTooLarge": "School logo must be smaller than 1MB",
+    "campusDescLabel": "Description:",
+    "campusWorkLabel": "Main work:",
     "avatarShape": "Shape",
     "circle": "Circle",
     "square": "Square",
@@ -186,7 +200,8 @@
     "template3": "Centered",
     "template4": "Formal",
     "template5": "Clear Classic",
-    "template6": "Shadow Canon"
+    "template6": "Shadow Canon",
+    "template7": "Campus Fresh Graduate"
   },
   "templateTag": {
     "twoColumn": "Two-column",

@@ -33,6 +33,7 @@ import {
   TooltipContent,
 } from '@/components/ui/tooltip';
 import { templateIds, definitions } from '@/components/Resume/templates';
+import { CAMPUS_TEMPLATE_ID } from '@/components/Resume/modules/CampusModules';
 import { ResumeView } from '@/components/Resume';
 import type { SpacingPreset } from '@/types';
 
@@ -51,10 +52,13 @@ const SPACING_PRESETS: SpacingPreset[] = ['compact', 'standard', 'spacious'];
 
 const MAX_VISIBLE_TAGS = 4;
 
-/** 根据当前语言获取示例简历用于模板预览 */
+/**
+ * 模板预览用的示例简历查询：模板可自带示例数据（TemplateDefinition.sampleResume，
+ * 如校园应届生模板用应届生示例），未声明时回退共享示例。
+ */
 function usePreviewResume() {
   const lang = useUIStore((s) => s.lang);
-  return useMemo(() => getSampleResume(lang), [lang]);
+  return useMemo(() => (templateId: string) => getSampleResume(lang, templateId), [lang]);
 }
 
 function FontSizeStepper({ value, onChange, min, max, step = 1 }: {
@@ -138,6 +142,56 @@ function SpacingPresetGroup({ value, onChange, labels }: {
   );
 }
 
+type CampusAccentSource = 'logo' | 'theme';
+
+/**
+ * 校园模板（template7）主体色来源选择：校徽主色 / 主题色。
+ * 与 SpacingPresetGroup 同一套胶囊滑块范式，仅选项数为 2。
+ */
+function AccentSourceGroup({ value, onChange, labels }: {
+  value: CampusAccentSource;
+  onChange: (v: CampusAccentSource) => void;
+  labels: Record<CampusAccentSource, string>;
+}) {
+  const reduceMotion = useReducedMotion();
+  // useId 隔离 layoutId 命名空间：避免与页边距/模块间距的胶囊串扰
+  const groupId = useId();
+  const options: CampusAccentSource[] = ['logo', 'theme'];
+  return (
+    <LayoutGroup id={groupId}>
+      <div className="grid grid-cols-2 rounded-full bg-gray-100 p-1">
+        {options.map((option) => {
+          const isActive = value === option;
+          return (
+            <button
+              key={option}
+              type="button"
+              onClick={() => onChange(option)}
+              className={cn(
+                'relative rounded-full px-3 py-1.5 text-sm font-medium transition-colors duration-[600ms]',
+                isActive ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700',
+              )}
+            >
+              {isActive && (
+                <motion.span
+                  layoutId="capsule-pill"
+                  className="absolute inset-0 rounded-full bg-white shadow-sm"
+                  transition={
+                    reduceMotion
+                      ? { duration: 0 }
+                      : { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
+                  }
+                />
+              )}
+              <span className="relative z-10">{labels[option]}</span>
+            </button>
+          );
+        })}
+      </div>
+    </LayoutGroup>
+  );
+}
+
 export function AppearanceDrawer() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -145,6 +199,8 @@ export function AppearanceDrawer() {
   const previewResume = usePreviewResume();
   const template = useUIStore((s) => s.template);
   const setTemplate = useUIStore((s) => s.setTemplate);
+  const resumeConfig = useResumeStore((s) => s.config);
+  const campusAccent: CampusAccentSource = resumeConfig?.['x-op-campusAccent'] ?? 'logo';
   const theme = useUIStore((s) => s.theme);
   const updateTheme = useUIStore((s) => s.updateTheme);
   const showIcons = useUIStore((s) => s.showIcons);
@@ -299,6 +355,21 @@ export function AppearanceDrawer() {
                 </div>
               </section>
 
+              {/* 校园模板主体色来源：校徽主色 / 主题色 */}
+              {template === CAMPUS_TEMPLATE_ID && (
+                <section>
+                  <h3 className="mb-2.5 text-sm font-medium text-foreground">{t('toolbar.campusAccentSource')}</h3>
+                  <AccentSourceGroup
+                    value={campusAccent}
+                    onChange={(v) => {
+                      useResumeStore.getState().update({ 'x-op-campusAccent': v });
+                      trackClarityEvent(`campus_accent_${v}`);
+                    }}
+                    labels={{ logo: t('toolbar.campusAccentLogo'), theme: t('toolbar.campusAccentTheme') }}
+                  />
+                </section>
+              )}
+
               {/* 图标显示 */}
               <section className="border-t border-gray-100 pt-6">
                 <div className="flex items-center justify-between">
@@ -390,7 +461,7 @@ export function AppearanceDrawer() {
                     )}
                     <div className="relative h-72 w-full overflow-hidden">
                       <div className="pointer-events-none absolute left-0 top-0 w-[210mm] origin-top-left scale-[0.28]">
-                        <ResumeView config={previewResume} templateId={key} disablePagination />
+                        <ResumeView config={previewResume(key)} templateId={key} disablePagination />
                       </div>
                     </div>
                     <div className="border-t border-gray-100 px-3 py-2.5">

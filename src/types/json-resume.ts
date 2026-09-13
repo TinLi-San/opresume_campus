@@ -154,8 +154,22 @@ export interface CustomModule {
   contentHtml: string;
 }
 
+/** 用户上传的校徽（data URL 形式，随简历存 localStorage） */
+export interface SchoolLogo {
+  src?: string;
+  /** 是否在简历中隐藏校徽 */
+  hidden?: boolean;
+}
+
 export interface JsonResume extends JsonResumeBase {
   'x-op-avatar'?: Avatar;
+  'x-op-schoolLogo'?: SchoolLogo;
+  /**
+   * 校园模板主体色来源（template7）：
+   * - 'logo'（默认）：从校徽图片提取主色，提取失败时回退「外观→主题色」
+   * - 'theme'：始终使用「外观→主题色」
+   */
+  'x-op-campusAccent'?: 'logo' | 'theme';
   'x-op-birthday'?: string;
   'x-op-ageHidden'?: boolean;
   'x-op-workExpYear'?: string;

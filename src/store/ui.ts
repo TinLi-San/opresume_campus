@@ -12,6 +12,8 @@ interface UIStore {
   editorOpen: boolean;
   activeModule: string | null;
   avatarEditorOpen: boolean;
+  /** 校徽编辑器（校园模板 template7 专用）展开状态 */
+  schoolLogoEditorOpen: boolean;
   /** 模块图标覆盖，键为模块名如 "educationList"，值为 lucide 图标名 */
   moduleIconMap: Record<string, string>;
   /** 自定义字段图标，键为字段 key（字段名称），值为 lucide 图标名 */
@@ -84,6 +86,7 @@ export const useUIStore = create<UIStore>()(
       editorOpen: false,
       activeModule: null,
       avatarEditorOpen: false,
+      schoolLogoEditorOpen: false,
       moduleIconMap: {},
       customFieldIconMap: {},
       showIcons: true,
@@ -167,6 +170,7 @@ export const useUIStore = create<UIStore>()(
         template: state.template,
         lang: state.lang,
         avatarEditorOpen: state.avatarEditorOpen,
+        schoolLogoEditorOpen: state.schoolLogoEditorOpen,
         moduleIconMap: state.moduleIconMap,
         customFieldIconMap: state.customFieldIconMap,
         showIcons: state.showIcons,

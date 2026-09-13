@@ -28,7 +28,7 @@ import { cn } from '@/lib/utils';
 import { useUIStore } from '@/store/ui';
 import { useResumeStore } from '@/store/resume';
 import type { Avatar, ModuleLayout } from '@/types/resume';
-import type { JsonResume } from '@/types/json-resume';
+import type { JsonResume, SchoolLogo } from '@/types/json-resume';
 import {
   Sheet,
   SheetContent,
@@ -59,6 +59,8 @@ import { schemas, type ModuleSchema, getCustomModuleSchema } from './schemas';
 import { FormCreator } from './FormCreator';
 import { ListEditor } from './ListEditor';
 import { AvatarEditor } from './AvatarEditor';
+import { SchoolLogoEditor } from './SchoolLogoEditor';
+import { CAMPUS_TEMPLATE_ID } from '@/components/Resume/modules/CampusModules';
 import { CustomFieldsEditor } from './CustomFieldsEditor';
 import { calculateAge } from '@/components/Resume/shared';
 import { getEffectiveLayout, isTwoColumnTemplate } from '@/config/layout';
@@ -254,6 +256,8 @@ function ProfileSection({
   update: (partial: Partial<JsonResume>) => void;
 }) {
   const { t } = useTranslation();
+  /* 校徽设置仅校园模板（template7）使用 */
+  const template = useUIStore((s) => s.template);
 
   // 从 JsonResume 构造虚拟 profile data 供 FormCreator 使用
   const data: Record<string, unknown> = {
@@ -316,6 +320,11 @@ function ProfileSection({
     [update],
   );
 
+  const handleSchoolLogoChange = useCallback(
+    (logo: SchoolLogo) => update({ 'x-op-schoolLogo': logo }),
+    [update],
+  );
+
   const handleCustomFieldsChange = useCallback(
     (customFields: NonNullable<JsonResume['x-op-customFields']>) => {
       update({ 'x-op-customFields': customFields });
@@ -326,6 +335,10 @@ function ProfileSection({
   return (
     <div className="space-y-3">
       <AvatarEditor avatar={config['x-op-avatar']} onChange={handleAvatarChange} />
+      {/* 校徽仅校园模板（template7）使用，避免在其它模板下出现无效设置项 */}
+      {template === CAMPUS_TEMPLATE_ID && (
+        <SchoolLogoEditor logo={config['x-op-schoolLogo']} onChange={handleSchoolLogoChange} />
+      )}
       <FormCreator fields={beforeFields} data={data} onChange={handleFieldChange} />
       <div className="space-y-1">
         <div className="flex items-center justify-between">

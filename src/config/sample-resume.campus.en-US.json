@@ -1,0 +1,171 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/master/schema.json",
+  "basics": {
+    "name": "Alex Johnson",
+    "label": "Frontend Engineer",
+    "email": "alex.johnson@example.com",
+    "phone": "(415) 555-0123"
+  },
+  "work": [
+    {
+      "name": "Meta",
+      "position": "Frontend Engineer Intern",
+      "startDate": "2026-01",
+      "endDate": "2026-06",
+      "highlights": [],
+      "x-op-id": "work-1",
+      "x-op-departmentName": "Reality Labs",
+      "x-op-workDescHtml": "<ul>\n<li>Built three field types for an internal data table platform in React and TypeScript</li>\n<li>Optimized virtual scrolling for 10K-row tables, raising the frame rate from 32fps to 58fps</li>\n<li>Added 12 unit tests to the shared component library and fixed 5 UI defects</li>\n<li>Took part in requirement and code reviews, landing 20+ changes by team conventions</li>\n</ul>"
+    },
+    {
+      "name": "Stripe",
+      "position": "Frontend Engineer Intern",
+      "startDate": "2025-06",
+      "endDate": "2025-08",
+      "highlights": [],
+      "x-op-id": "work-2",
+      "x-op-departmentName": "Dashboard Team",
+      "x-op-workDescHtml": "<ul>\n<li>Shipped six ECharts-based analytics widgets for the merchant dashboard</li>\n<li>Cut dashboard LCP from 3.2s to 1.6s with route-level code splitting and parallel data fetching</li>\n<li>Wrote usage docs and component examples that three other teams reused</li>\n</ul>"
+    }
+  ],
+  "education": [
+    {
+      "institution": "University of California, Berkeley",
+      "area": "Computer Science",
+      "studyType": "B.S.",
+      "startDate": "2022-08",
+      "endDate": "2026-05",
+      "score": "GPA 3.8/4.0",
+      "x-op-id": "edu-1"
+    }
+  ],
+  "projects": [
+    {
+      "name": "Real-Time Collaborative Document Editor",
+      "description": "Senior capstone: a multi-user document editor with rich text editing, comments and version history",
+      "startDate": "2025-12",
+      "endDate": "2026-05",
+      "roles": [
+        "Capstone Project"
+      ],
+      "x-op-id": "proj-1",
+      "x-op-type": "project",
+      "x-op-projectContentHtml": "<ul><li><p>Built a rich text editing core on ProseMirror supporting 20+ block types and common inline styles</p></li><li><p>Integrated the Yjs CRDT engine for concurrent editing, cursor sync and automatic conflict merging</p></li><li><p>Designed WebSocket reconnection and local draft caching, losing zero edits on unstable networks</p></li></ul>"
+    },
+    {
+      "name": "Campus Marketplace",
+      "description": "A second-hand marketplace for university students covering listing, search, checkout and chat",
+      "startDate": "2025-03",
+      "endDate": "2025-06",
+      "roles": [
+        "Frontend Lead"
+      ],
+      "x-op-id": "proj-2",
+      "x-op-type": "project",
+      "x-op-projectContentHtml": "<ul><li><p>Delivered 18 pages and 30+ components, integrating OAuth login, payments and push notifications</p></li><li><p>Implemented paged product feeds and lazy-loaded images, keeping first paint under 800ms</p></li><li><p>Reached 2,000+ registered users and 300+ daily actives; selected for a university innovation grant</p></li></ul>"
+    },
+    {
+      "name": "Algorithm Visualizer",
+      "description": "An interactive visualizer that animates common data structures and algorithms step by step",
+      "startDate": "2024-09",
+      "endDate": "2024-12",
+      "roles": [
+        "Core Developer"
+      ],
+      "x-op-id": "proj-3",
+      "x-op-type": "project",
+      "x-op-projectContentHtml": "<ul><li><p>Implemented animated walkthroughs and single-step debugging for 12 algorithms on Canvas</p></li><li><p>Designed execution snapshots with seek and playback-speed controls</p></li><li><p>Open sourced on GitHub with 120+ stars; used as a teaching demo in a campus algorithms course</p></li></ul>"
+    },
+    {
+      "name": "GitHub Portfolio",
+      "description": "Technical blog and open-source projects with 40+ posts on frontend development",
+      "url": "https://github.com/alexjohnson",
+      "x-op-id": "portfolio-1",
+      "x-op-type": "portfolio"
+    }
+  ],
+  "skills": [
+    {
+      "name": "React / TypeScript",
+      "level": "Proficient",
+      "x-op-id": "skill-1",
+      "x-op-skillLevel": 85
+    },
+    {
+      "name": "Vue 3 / Vite",
+      "level": "Proficient",
+      "x-op-id": "skill-2",
+      "x-op-skillLevel": 80
+    },
+    {
+      "name": "HTML / CSS / Tailwind CSS",
+      "level": "Proficient",
+      "x-op-id": "skill-3",
+      "x-op-skillLevel": 80
+    },
+    {
+      "name": "Node.js / Express",
+      "level": "Familiar",
+      "x-op-id": "skill-4",
+      "x-op-skillLevel": 70
+    },
+    {
+      "name": "Git / Frontend Tooling",
+      "level": "Familiar",
+      "x-op-id": "skill-5",
+      "x-op-skillLevel": 70
+    },
+    {
+      "name": "Testing / Playwright",
+      "level": "Familiar",
+      "x-op-id": "skill-6",
+      "x-op-skillLevel": 65
+    }
+  ],
+  "awards": [
+    {
+      "title": "Berkeley Regents' and Chancellor's Scholarship",
+      "date": "2025.11",
+      "x-op-id": "award-1"
+    },
+    {
+      "title": "ACM Student Research Competition, 1st Place",
+      "date": "2025.06",
+      "x-op-id": "award-2"
+    },
+    {
+      "title": "Cal Hacks — Best UX Award",
+      "date": "2025.04",
+      "x-op-id": "award-3"
+    },
+    {
+      "title": "Dean's List, College of Engineering",
+      "date": "2024.11",
+      "x-op-id": "award-4"
+    }
+  ],
+  "x-op-avatar": {
+    "width": 90,
+    "height": 126,
+    "borderRadius": 0,
+    "hidden": true
+  },
+  "x-op-birthday": "2004-03-15",
+  "x-op-ageHidden": true,
+  "x-op-workExpYear": "1",
+  "x-op-customFields": [
+    {
+      "key": "Location",
+      "value": "San Francisco, CA"
+    }
+  ],
+  "x-op-aboutmeHtml": "<p>Computer Science graduate (Class of 2026) focused on frontend engineering. Two internship experiences shipping production React features end to end, with hands-on practice in performance optimization and code review. Comfortable with modern frontend tooling and eager to grow within a strong frontend team.</p>",
+  "x-op-template": "template7",
+  "x-op-customModules": [
+    {
+      "id": "custom-campusCourses",
+      "title": "Courses",
+      "contentHtml": "<p>Data Structures and Algorithms, Operating Systems, Computer Networks, Database Systems, Web Front-end Development, Software Engineering</p>"
+    }
+  ]
+}

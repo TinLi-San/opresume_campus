@@ -176,5 +176,9 @@
       "value": "San Francisco, CA"
     }
   ],
-  "x-op-aboutmeHtml": "<p>Senior Frontend Engineer with 5+ years of experience specializing in React ecosystem and frontend architecture. Proven track record of building scalable web applications serving millions of users. Passionate about performance optimization, developer experience, and open source contribution. Strong advocate for code quality, testing, and mentoring junior engineers.</p>"
+  "x-op-aboutmeHtml": "<p>Senior Frontend Engineer with 5+ years of experience specializing in React ecosystem and frontend architecture. Proven track record of building scalable web applications serving millions of users. Passionate about performance optimization, developer experience, and open source contribution. Strong advocate for code quality, testing, and mentoring junior engineers.</p>",
+  "x-op-schoolLogo": {
+    "hidden": true
+  },
+  "x-op-campusAccent": "theme"
 }

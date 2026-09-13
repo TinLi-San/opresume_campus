@@ -55,6 +55,19 @@ export interface TemplateDefinition {
   tags: string[];
   /** 默认模块布局：sidebar 和 main 各放哪些模块（不含 profile） */
   defaultLayout: ModuleLayout;
+  /**
+   * 模板为固定单页版式：渲染器不做分页（如校园应届生 A4 一页模板）。
+   * 与 `tags` 里的 'singlePage' 是两件事——后者只是模板选择器上的展示标签。
+   */
+  singlePage?: boolean;
+  /**
+   * 模板自带的示例简历（可选，键为语言代码，如 'zh-CN' / 'en-US'）。
+   *
+   * 用于「按模板展示示例数据」的场景（模板选择器缩略图等）：例如校园应届生
+   * 模板应当用应届生示例，而共享示例（src/config/sample-resume.*.json）是给
+   * 其他模板用的通用示例。未声明时回退共享示例，故新增模板不会影响既有模板。
+   */
+  sampleResume?: Record<string, JsonResume>;
   getTokens: () => StyleTokens;
   /** 侧栏专用 tokens，未提供时回退到 getTokens() */
   getSidebarTokens?: () => StyleTokens;

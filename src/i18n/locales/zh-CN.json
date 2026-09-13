@@ -5,6 +5,8 @@
   },
   "common": {
     "loading": "加载中...",
+    "listSeparator": "、",
+    "labelSeparator": "：",
     "loadError": "加载简历数据失败",
     "saveError": "保存失败",
     "retry": "重试",
@@ -54,6 +56,9 @@
   },
   "toolbar": {
     "template": "模板",
+    "campusAccentSource": "主体色来源",
+    "campusAccentLogo": "校徽主色",
+    "campusAccentTheme": "主题色",
     "templateDesc": "选择适合您的简历模板",
     "theme": "主题",
     "language": "语言",
@@ -135,6 +140,15 @@
     "customFieldKey": "字段名",
     "customFieldValue": "字段值",
     "avatar": "头像",
+    "schoolLogo": "校徽",
+    "uploadSchoolLogo": "上传校徽",
+    "changeSchoolLogo": "更换校徽",
+    "removeSchoolLogo": "删除校徽",
+    "schoolLogoHint": "用于校园模板左上角。未上传时显示模板内置的默认校徽；上传后以你的校徽为准。",
+    "schoolLogoHiddenHint": "当前已隐藏，简历中不显示校徽。",
+    "schoolLogoTooLarge": "校徽图片大小不能超过 1MB",
+    "campusDescLabel": "描述：",
+    "campusWorkLabel": "主要工作：",
     "avatarShape": "形状",
     "circle": "圆形",
     "square": "方形",
@@ -186,7 +200,8 @@
     "template3": "清新居中",
     "template4": "正式徽章",
     "template5": "清朗经典",
-    "template6": "侧影典章"
+    "template6": "侧影典章",
+    "template7": "校园应届生"
   },
   "templateTag": {
     "twoColumn": "双栏",

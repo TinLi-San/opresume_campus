@@ -1,0 +1,189 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/master/schema.json",
+  "basics": {
+    "name": "张三",
+    "label": "前端开发工程师",
+    "email": "zhangsan@example.com",
+    "phone": "13800000000"
+  },
+  "work": [
+    {
+      "name": "字节跳动",
+      "position": "前端开发实习生",
+      "startDate": "2026-01",
+      "endDate": "2026-06",
+      "highlights": [],
+      "x-op-id": "work-1",
+      "x-op-departmentName": "飞书前端团队",
+      "x-op-workDescHtml": "<ul>\n<li>参与飞书多维表格前端功能开发，独立完成 3 种字段类型的视图渲染与交互实现</li>\n<li>负责表格虚拟滚动性能优化，万行数据滚动帧率由 32fps 提升至 58fps</li>\n<li>为团队组件库补充 12 个单元测试用例，修复 5 个线上交互缺陷</li>\n<li>参与需求评审与代码 Review，按团队规范累计提交 20+ 次代码变更</li>\n</ul>"
+    },
+    {
+      "name": "美团",
+      "position": "前端开发实习生",
+      "startDate": "2025-07",
+      "endDate": "2025-09",
+      "highlights": [],
+      "x-op-id": "work-2",
+      "x-op-departmentName": "到店事业群前端组",
+      "x-op-workDescHtml": "<ul>\n<li>参与商家端门店经营数据看板开发，基于 ECharts 完成 6 个数据图表的封装与联调</li>\n<li>通过路由懒加载与接口并行请求优化首屏性能，看板 LCP 由 3.2s 降至 1.6s</li>\n<li>编写看板使用文档与组件示例，被组内 3 个项目复用</li>\n</ul>"
+    }
+  ],
+  "education": [
+    {
+      "institution": "东华大学",
+      "area": "计算机科学与技术",
+      "studyType": "本科",
+      "startDate": "2022-09",
+      "endDate": "2026-06",
+      "score": "GPA 3.8/4.0",
+      "x-op-id": "edu-1"
+    }
+  ],
+  "projects": [
+    {
+      "name": "在线协同文档编辑器",
+      "description": "本科毕业设计：支持多人实时协同编辑的在线文档系统，具备富文本编辑、评论与版本回溯能力",
+      "startDate": "2025-12",
+      "endDate": "2026-06",
+      "roles": [
+        "毕业设计"
+      ],
+      "x-op-id": "proj-1",
+      "x-op-type": "project",
+      "x-op-projectContentHtml": "<ul><li><p>基于 ProseMirror 实现富文本编辑内核，支持 20+ 块级元素与常用行内样式</p></li><li><p>接入 Yjs CRDT 协同引擎，实现多人同时编辑、光标同步与冲突自动合并</p></li><li><p>设计 WebSocket 心跳重连与本地草稿缓存机制，弱网环境下编辑内容零丢失</p></li></ul>"
+    },
+    {
+      "name": "校园二手交易平台（微信小程序）",
+      "description": "面向校内学生的二手物品交易小程序，覆盖商品发布、搜索、下单与在线沟通全流程",
+      "startDate": "2025-03",
+      "endDate": "2025-06",
+      "roles": [
+        "前端负责人"
+      ],
+      "x-op-id": "proj-2",
+      "x-op-type": "project",
+      "x-op-projectContentHtml": "<ul><li><p>独立完成 18 个页面与 30+ 组件的开发，接入微信登录、支付与订阅消息</p></li><li><p>基于云开发实现商品列表分页与图片懒加载，首页首屏渲染控制在 800ms 以内</p></li><li><p>上线后累计注册用户 2000+、日均活跃 300+，获校级大学生创新创业项目立项</p></li></ul>"
+    },
+    {
+      "name": "数据结构与算法可视化平台",
+      "description": "将常见数据结构与算法以动画形式可视化，帮助初学者理解算法的执行过程",
+      "startDate": "2024-09",
+      "endDate": "2024-12",
+      "roles": [
+        "核心开发"
+      ],
+      "x-op-id": "proj-3",
+      "x-op-type": "project",
+      "x-op-projectContentHtml": "<ul><li><p>基于 Canvas 实现排序、二叉树、图遍历等 12 种算法的动画演示与单步调试</p></li><li><p>设计算法执行快照与播放控制机制，支持进度拖拽与倍速播放</p></li><li><p>项目开源至 GitHub 并累计获得 120+ Star，被校内算法课程用作教学演示</p></li></ul>"
+    },
+    {
+      "name": "个人项目地址",
+      "description": "个人技术博客与开源项目主页，累计发表 40+ 篇前端学习笔记与项目源码",
+      "url": "https://github.com/oopooa/opresume",
+      "x-op-id": "portfolio-1",
+      "x-op-type": "portfolio"
+    }
+  ],
+  "skills": [
+    {
+      "name": "React / TypeScript",
+      "level": "熟练",
+      "x-op-id": "skill-1",
+      "x-op-skillLevel": 85
+    },
+    {
+      "name": "Vue 3 / Vite",
+      "level": "熟练",
+      "x-op-id": "skill-2",
+      "x-op-skillLevel": 80
+    },
+    {
+      "name": "HTML / CSS / Tailwind CSS",
+      "level": "熟练",
+      "x-op-id": "skill-3",
+      "x-op-skillLevel": 80
+    },
+    {
+      "name": "Node.js / Express",
+      "level": "掌握",
+      "x-op-id": "skill-4",
+      "x-op-skillLevel": 70
+    },
+    {
+      "name": "Git / 前端工程化",
+      "level": "掌握",
+      "x-op-id": "skill-5",
+      "x-op-skillLevel": 70
+    },
+    {
+      "name": "微信小程序 / uni-app",
+      "level": "熟悉",
+      "x-op-id": "skill-6",
+      "x-op-skillLevel": 65
+    }
+  ],
+  "awards": [
+    {
+      "title": "国家奖学金",
+      "date": "2025.11",
+      "x-op-id": "award-1"
+    },
+    {
+      "title": "中国大学生计算机设计大赛 省级一等奖",
+      "date": "2025.06",
+      "x-op-id": "award-2"
+    },
+    {
+      "title": "蓝桥杯全国软件和信息技术专业人才大赛 省级二等奖",
+      "date": "2025.04",
+      "x-op-id": "award-3"
+    },
+    {
+      "title": "东华大学 校级一等奖学金",
+      "date": "2024.11",
+      "x-op-id": "award-4"
+    }
+  ],
+  "publications": [
+    {
+      "name": "基于 WebAssembly 的浏览器端图像处理性能优化研究",
+      "publisher": "计算机教育",
+      "releaseDate": "2025.09",
+      "x-op-type": "论文",
+      "x-op-identifier": "DOI: 10.1234/jce.2025.09.014",
+      "x-op-id": "publication-1"
+    },
+    {
+      "name": "一种前端组件自动化测试方法及系统",
+      "publisher": "国家知识产权局",
+      "releaseDate": "2025.03",
+      "x-op-type": "发明专利",
+      "x-op-identifier": "CN202510234567.8",
+      "x-op-id": "publication-2"
+    }
+  ],
+  "x-op-avatar": {
+    "width": 90,
+    "height": 126,
+    "borderRadius": 0,
+    "hidden": true
+  },
+  "x-op-birthday": "2004-03-15",
+  "x-op-ageHidden": true,
+  "x-op-workExpYear": "1",
+  "x-op-customFields": [
+    {
+      "key": "工作地点",
+      "value": "上海"
+    }
+  ],
+  "x-op-aboutmeHtml": "<p>2026 届计算机科学与技术专业本科毕业生，专注前端开发方向。拥有两段互联网公司前端实习经历，熟悉 React 技术栈与前端工程化流程，独立完成过校园项目从需求分析到上线的完整开发。注重代码规范与团队协作，学习能力强，希望加入优秀的前端团队持续成长。</p>",
+  "x-op-template": "template7",
+  "x-op-customModules": [
+    {
+      "id": "custom-campusCourses",
+      "title": "修读课程",
+      "contentHtml": "<p>数据结构与算法、操作系统、计算机网络、数据库系统原理、Web 前端开发、软件工程</p>"
+    }
+  ]
+}
